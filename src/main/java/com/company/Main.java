@@ -1,7 +1,6 @@
 package com.company;
 
 import com.company.crypto.Cypher;
-import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
 import com.company.crypto.algorithm.impl.DES;
 import com.company.crypto.mode.SymmetricalBlockMode;
 

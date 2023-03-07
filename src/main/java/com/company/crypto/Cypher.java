@@ -6,7 +6,9 @@ import com.company.crypto.mode.SymmetricalBlockMode;
 import com.company.crypto.mode.fabric.SymmetricalBlockCypherFabric;
 import com.company.crypto.mode.fabric.impl.ECBFabric;
 
+import java.io.Closeable;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -14,7 +16,7 @@ import java.util.Objects;
 /**
  * Main encoder/decoder. Get symmetric algorithm (64 bit encoder/decoder), mode, and other param.
  **/
-public final class Cypher {
+public final class Cypher implements Closeable {
     private final static Map<SymmetricalBlockMode, SymmetricalBlockCypherFabric> modeAndItsFabric = new HashMap<>();
     {
         modeAndItsFabric.put(SymmetricalBlockMode.ECB, new ECBFabric());
@@ -49,4 +51,13 @@ public final class Cypher {
         symmetricalBlockCypher.decode(inputFile, outputFile);
     }
 
+    @Override
+    public void close() {
+        // TODO для executor
+        try {
+            symmetricalBlockCypher.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -4,6 +4,7 @@ import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
 import com.company.crypto.mode.cypher.SymmetricalBlockCypher;
 
 import java.io.File;
+import java.io.IOException;
 
 public final class ECBCypher implements SymmetricalBlockCypher {
     private final Class<? extends SymmetricalBlockEncryptionAlgorithm> algorithmClass;
@@ -22,5 +23,10 @@ public final class ECBCypher implements SymmetricalBlockCypher {
     @Override
     public void decode(File inputFile, File outputFile) {
         System.out.println("Deocode");
+    }
+
+    @Override
+    public void close()  {
+        // Executor
     }
 }
