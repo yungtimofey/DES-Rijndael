@@ -24,24 +24,24 @@ public final class Cypher implements Closeable {
 
     public static Cypher build(byte[] key,
                                SymmetricalBlockMode symmetricalBlockMode,
-                               Class<? extends SymmetricalBlockEncryptionAlgorithm> algorithmClass,
+                               SymmetricalBlockEncryptionAlgorithm algorithm,
                                Object ... args) {
         Objects.requireNonNull(key);
         Objects.requireNonNull(symmetricalBlockMode);
-        Objects.requireNonNull(algorithmClass);
-        return new Cypher(key, symmetricalBlockMode, algorithmClass, args);
+        Objects.requireNonNull(algorithm);
+
+        return new Cypher(key, symmetricalBlockMode, algorithm, args);
     }
 
     private final SymmetricalBlockCypher symmetricalBlockCypher;
     private Cypher(byte[] key,
                    SymmetricalBlockMode mode,
-                   Class<? extends SymmetricalBlockEncryptionAlgorithm> algorithmClass,
+                   SymmetricalBlockEncryptionAlgorithm algorithm,
                    Object ... args) {
 
         SymmetricalBlockCypherFabric cypherFabric = modeAndItsFabric.get(mode);
-        this.symmetricalBlockCypher = cypherFabric.create(algorithmClass, key, args);
+        this.symmetricalBlockCypher = cypherFabric.create(algorithm, key, args);
     }
-
 
     public void encode(File inputFile, File outputFile) {
         symmetricalBlockCypher.encode(inputFile, outputFile);

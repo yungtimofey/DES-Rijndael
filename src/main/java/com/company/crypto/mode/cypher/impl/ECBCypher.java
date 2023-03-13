@@ -4,14 +4,13 @@ import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
 import com.company.crypto.mode.cypher.SymmetricalBlockCypher;
 
 import java.io.File;
-import java.io.IOException;
 
 public final class ECBCypher implements SymmetricalBlockCypher {
-    private final Class<? extends SymmetricalBlockEncryptionAlgorithm> algorithmClass;
+    private final SymmetricalBlockEncryptionAlgorithm algorithm;
     private final byte[] key;
 
-    public ECBCypher(Class<? extends SymmetricalBlockEncryptionAlgorithm> algorithmClass, byte[] key) {
-        this.algorithmClass = algorithmClass;
+    public ECBCypher(SymmetricalBlockEncryptionAlgorithm algorithm, byte[] key) {
+        this.algorithm = algorithm;
         this.key = key;
     }
 

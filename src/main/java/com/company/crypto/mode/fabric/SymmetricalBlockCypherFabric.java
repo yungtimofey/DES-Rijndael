@@ -6,7 +6,7 @@ import com.company.crypto.mode.cypher.SymmetricalBlockCypher;
 
 public interface SymmetricalBlockCypherFabric {
     SymmetricalBlockCypher create(
-            Class<? extends SymmetricalBlockEncryptionAlgorithm> algorithmClass,
+            SymmetricalBlockEncryptionAlgorithm algorithm,
             byte[] key,
             Object... args
     );
