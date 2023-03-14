@@ -9,32 +9,24 @@ public class FeistelNetwork implements SymmetricalBlockEncryptionAlgorithm {
 
     private final RoundKeysGenerator roundKeysGenerator;
     private final RoundTransformer roundTransformer;
+    private byte[] key64Bit;
 
     public FeistelNetwork(RoundKeysGenerator roundKeysGenerator, RoundTransformer roundTransformer) {
         this.roundKeysGenerator = roundKeysGenerator;
         this.roundTransformer = roundTransformer;
     }
 
+    public void setKey64Bit(byte[] key64Bit) {
+        this.key64Bit = key64Bit;
+    }
+
     @Override
-    public byte[] encode(byte[] array, byte[] key) {
-        byte[][] roundKeys = roundKeysGenerator.generate(key);
-
-        for (int i = 0; i < ROUND_NUMBER; i++) {
-            byte[] roundKey = roundKeys[i];
-
-        }
-
+    public byte[] encode(byte[] inputBlock64Bit) {
         return null;
     }
 
     @Override
-    public byte[] decode(byte[] array, byte[] key) {
-        byte[][] keys = roundKeysGenerator.generate(key);
-
-        for (int i = 0; i < ROUND_NUMBER; i++) {
-
-        }
-
+    public byte[] decode(byte[] outputBlock64Bit) {
         return null;
     }
 

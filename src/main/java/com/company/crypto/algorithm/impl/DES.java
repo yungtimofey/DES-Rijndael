@@ -1,5 +1,6 @@
 package com.company.crypto.algorithm.impl;
 
+import com.company.crypto.algorithm.impl.FeistelNetwork;
 import com.company.crypto.round.RoundKeysGenerator;
 import com.company.crypto.round.RoundTransformer;
 
