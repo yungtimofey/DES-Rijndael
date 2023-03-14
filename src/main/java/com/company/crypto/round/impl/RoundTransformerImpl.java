@@ -5,7 +5,6 @@ import com.company.crypto.round.RoundTransformer;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-import java.util.stream.IntStream;
 
 final class RoundTransformerImpl implements RoundTransformer {
     private static final int HALF_SIZE = 32;
@@ -69,9 +68,15 @@ final class RoundTransformerImpl implements RoundTransformer {
                     2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11
             }
     };
+    private static final int[] P = {
+            16,	7,	20,	21,	29,	12,	28,	17,
+            1,	15,	23,	26,	5,	18,	31,	10,
+            2,	8,	24,	14,	32,	27,	3,	9,
+            19,	13,	30,	6,	22,	11,	4,	25
+    };
 
     @Override
-    public byte[] encode(byte[] inputBlock64Bit, byte[] roundKey56Bit, int roundNumber) {
+    public byte[] encode(byte[] inputBlock64Bit, byte[] roundKey56Bit) {
         BitSet inputBitSet = BitSet.valueOf(inputBlock64Bit);
         BitSet rightHalf = getRightHalf(inputBitSet);
         BitSet leftHalf = getLeftHalf(inputBitSet);
@@ -80,8 +85,13 @@ final class RoundTransformerImpl implements RoundTransformer {
         expandedRightHalf.xor(BitSet.valueOf(roundKey56Bit));
 
         final int currentGroupSize = 6, newGroupSize = 4;
-        rightHalf = reduceXoredRightHalf(expandedRightHalf, currentGroupSize, newGroupSize);
-        return splitTwoPartsInReverseOrder(leftHalf, rightHalf).toByteArray();
+        BitSet f = reduceXoredRightHalf(expandedRightHalf, currentGroupSize, newGroupSize);
+
+        f = lastPermutation(f);
+
+        f.xor(leftHalf);
+
+        return combineTwoPartsInReverseOrder(rightHalf, f).toByteArray();
     }
 
     BitSet getLeftHalf(BitSet inputBitSet) {
@@ -125,7 +135,7 @@ final class RoundTransformerImpl implements RoundTransformer {
                 boolean bit = ((sDigit >> (newGroupSize - 1 - k)) & 1) == 1;
                 reducedRightHalf.set(j++, bit);
             }
-            print(reducedRightHalf);
+            //print(reducedRightHalf);
         }
 
         return reducedRightHalf;
@@ -167,10 +177,29 @@ final class RoundTransformerImpl implements RoundTransformer {
     }
 
 
-    BitSet splitTwoPartsInReverseOrder(BitSet leftHalf, BitSet rightHalf) {
-        long leftDigit = leftHalf.toLongArray()[0];
-        long rightDigit = rightHalf.toByteArray()[0];
-        return BitSet.valueOf(new long[]{rightDigit, leftDigit});
+    BitSet lastPermutation(BitSet rightHalf) {
+        BitSet bitSet = new BitSet();
+        for (int i = 0; i < P.length; i++) {
+            bitSet.set(i, rightHalf.get(P[i]-1));
+        }
+        return bitSet;
+    }
+
+    BitSet combineTwoPartsInReverseOrder(BitSet leftHalf, BitSet rightHalf) {
+        print(leftHalf);
+        print(rightHalf);
+
+        BitSet combinedBitset = new BitSet();
+        for (int i = 0; i < HALF_SIZE*2; i++) {
+            if (i < HALF_SIZE) {
+                combinedBitset.set(i, leftHalf.get(i));
+            } else {
+                combinedBitset.set(i, rightHalf.get(i % HALF_SIZE));
+            }
+        }
+        print(combinedBitset);
+
+        return combinedBitset;
     }
 
     private static void print(BitSet bitSet) {
@@ -186,7 +215,7 @@ final class RoundTransformerImpl implements RoundTransformer {
 
 
     @Override
-    public byte[] decode(byte[] outputBlock64Bit, byte[] roundKey56Bit, int roundNumber) {
+    public byte[] decode(byte[] outputBlock64Bit, byte[] roundKey56Bit) {
         return new byte[0];
     }
 }
