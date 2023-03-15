@@ -30,9 +30,5 @@ p
 @src/main/java/com/company/crypto/mode/cypher/impl/ECBCypher.java,b\5\b5ebdb26be25e4250611d1947b86e6a6cb0089cd
 \
 ,src/main/java/com/company/crypto/Cypher.java,e\0\e03848512678c836ca1bf38ef19f5d5096ce25e2
-s
-Csrc/main/java/com/company/crypto/algorithm/impl/FeistelNetwork.java,e\a\eaba1a5881436d9161c1955e7e22c805931e71b2
-h
-8src/main/java/com/company/crypto/algorithm/impl/DES.java,d\1\d167b84f0f45c9cfcbc8ec2b87dc346605bde8c6
 ƒ
 Ssrc/main/java/com/company/crypto/algorithm/SymmetricalBlockEncryptionAlgorithm.java,9\4\94367b5cb62987b74d098accd5f32f6cea23a734

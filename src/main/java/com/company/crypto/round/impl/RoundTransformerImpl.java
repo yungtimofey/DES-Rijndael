@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
-final class RoundTransformerImpl implements RoundTransformer {
+public final class RoundTransformerImpl implements RoundTransformer {
     private static final int HALF_SIZE = 32;
     private static final int[] E = {
             32, 1, 2, 3, 4, 5,
@@ -69,29 +69,31 @@ final class RoundTransformerImpl implements RoundTransformer {
             }
     };
     private static final int[] P = {
-            16,	7,	20,	21,	29,	12,	28,	17,
-            1,	15,	23,	26,	5,	18,	31,	10,
-            2,	8,	24,	14,	32,	27,	3,	9,
-            19,	13,	30,	6,	22,	11,	4,	25
+            16, 7, 20, 21, 29, 12, 28, 17,
+            1, 15, 23, 26, 5, 18, 31, 10,
+            2, 8, 24, 14, 32, 27, 3, 9,
+            19, 13, 30, 6, 22, 11, 4, 25
     };
 
     @Override
-    public byte[] encode(byte[] inputBlock64Bit, byte[] roundKey56Bit) {
+    public byte[] doRound(byte[] inputBlock64Bit, byte[] roundKey56Bit, boolean isLastRound) {
         BitSet inputBitSet = BitSet.valueOf(inputBlock64Bit);
         BitSet rightHalf = getRightHalf(inputBitSet);
         BitSet leftHalf = getLeftHalf(inputBitSet);
 
-        BitSet expandedRightHalf = expandRightHalf(rightHalf);
+        BitSet expandedRightHalf = expandHalf(rightHalf);
         expandedRightHalf.xor(BitSet.valueOf(roundKey56Bit));
 
         final int currentGroupSize = 6, newGroupSize = 4;
-        BitSet f = reduceXoredRightHalf(expandedRightHalf, currentGroupSize, newGroupSize);
+        BitSet f = reduceXoredHalf(expandedRightHalf, currentGroupSize, newGroupSize);
 
         f = lastPermutation(f);
 
         f.xor(leftHalf);
 
-        return combineTwoPartsInReverseOrder(rightHalf, f).toByteArray();
+        return isLastRound
+                ? combineTwoParts(f, rightHalf).toByteArray()
+                : combineTwoParts(rightHalf, f).toByteArray();
     }
 
     BitSet getLeftHalf(BitSet inputBitSet) {
@@ -107,7 +109,7 @@ final class RoundTransformerImpl implements RoundTransformer {
         return BitSet.valueOf(new long[]{digit});
     }
 
-    BitSet expandRightHalf(BitSet rightHalf) {
+    BitSet expandHalf(BitSet rightHalf) {
         BitSet expandedRightHalf = new BitSet(E.length);
         for (int i = 0; i < E.length; i++) {
             expandedRightHalf.set(i, rightHalf.get(E[i] - 1));
@@ -115,12 +117,12 @@ final class RoundTransformerImpl implements RoundTransformer {
         return expandedRightHalf;
     }
 
-    BitSet reduceXoredRightHalf(BitSet expandedRightHalf, int currentGroupSize, int newGroupSize) {
+    BitSet reduceXoredHalf(BitSet expandedHalf, int currentGroupSize, int newGroupSize) {
         final int columnBits = 2;
         final int rowSize = 1 << (currentGroupSize - columnBits);
 
-        List<Integer> rows = getRows(expandedRightHalf, currentGroupSize);
-        List<Integer> columns = getColumns(expandedRightHalf, currentGroupSize);
+        List<Integer> rows = getRows(expandedHalf, currentGroupSize);
+        List<Integer> columns = getColumns(expandedHalf, currentGroupSize);
 
         BitSet reducedRightHalf = new BitSet();
         for (int i = 0, j = 0; i < rows.size(); i++) {
@@ -140,16 +142,17 @@ final class RoundTransformerImpl implements RoundTransformer {
 
         return reducedRightHalf;
     }
-    private List<Integer> getRows(BitSet expandedRightHalf, int currentGroupSize) {
+
+    List<Integer> getRows(BitSet expandedRightHalf, int currentGroupSize) {
         List<Integer> rows = new ArrayList<>();
 
         final int columnBits = 2, rowsBits = currentGroupSize - columnBits;
         int i = 1;
         while (i < expandedRightHalf.length()) {
             int digit = 0;
-            for (int j = 1; j <= rowsBits ; j++) {
+            for (int j = 1; j <= rowsBits; j++) {
                 int currentBit = expandedRightHalf.get(i + rowsBits - j) ? 1 : 0;
-                digit += (1 << (j-1)) * currentBit;
+                digit += (1 << (j - 1)) * currentBit;
             }
             rows.add(digit);
             i += currentGroupSize;
@@ -157,7 +160,7 @@ final class RoundTransformerImpl implements RoundTransformer {
 
         return rows;
     }
-    private List<Integer> getColumns(BitSet expandedRightHalf, int currentGroupSize) {
+    List<Integer> getColumns(BitSet expandedRightHalf, int currentGroupSize) {
         List<Integer> columns = new ArrayList<>();
 
         final int columnBits = 2;
@@ -176,29 +179,19 @@ final class RoundTransformerImpl implements RoundTransformer {
         return columns;
     }
 
-
     BitSet lastPermutation(BitSet rightHalf) {
         BitSet bitSet = new BitSet();
         for (int i = 0; i < P.length; i++) {
-            bitSet.set(i, rightHalf.get(P[i]-1));
+            bitSet.set(i, rightHalf.get(P[i] - 1));
         }
         return bitSet;
     }
 
-    BitSet combineTwoPartsInReverseOrder(BitSet leftHalf, BitSet rightHalf) {
-        print(leftHalf);
-        print(rightHalf);
-
+    BitSet combineTwoParts(BitSet leftHalf, BitSet rightHalf) {
         BitSet combinedBitset = new BitSet();
-        for (int i = 0; i < HALF_SIZE*2; i++) {
-            if (i < HALF_SIZE) {
-                combinedBitset.set(i, leftHalf.get(i));
-            } else {
-                combinedBitset.set(i, rightHalf.get(i % HALF_SIZE));
-            }
+        for (int i = 0; i < HALF_SIZE * 2; i++) {
+            combinedBitset.set(i, (i < HALF_SIZE) ? leftHalf.get(i) : rightHalf.get(i % HALF_SIZE));
         }
-        print(combinedBitset);
-
         return combinedBitset;
     }
 
@@ -211,11 +204,5 @@ final class RoundTransformerImpl implements RoundTransformer {
             s.append(bitSet.get(i) ? 1 : 0);
         }
         System.out.println(s);
-    }
-
-
-    @Override
-    public byte[] decode(byte[] outputBlock64Bit, byte[] roundKey56Bit) {
-        return new byte[0];
     }
 }

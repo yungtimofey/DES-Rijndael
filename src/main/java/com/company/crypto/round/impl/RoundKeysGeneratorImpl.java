@@ -71,7 +71,7 @@ public final class RoundKeysGeneratorImpl implements RoundKeysGenerator {
 
         final int sizeOfDigit = PC_1_LENGTH / 2;
         digit = (digit >> n) | (digit << (sizeOfDigit - n));
-        digit &= (long) (2 << sizeOfDigit) - 1;
+        //digit &= (2L << (sizeOfDigit-1)) - 1;
 
         return BitSet.valueOf(new long[]{digit});
     }
