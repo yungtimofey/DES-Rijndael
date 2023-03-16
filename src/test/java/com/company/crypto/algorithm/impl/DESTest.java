@@ -70,26 +70,70 @@ class DESTest {
 
     @Test
     void checkTextFile() throws IOException {
-        int bufferSize = 8;
-
-//        String inputFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\Patrick.mp4";
-//        String encodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.mp4";
-//        String decodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.mp4";
-
         String inputFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\1.txt";
         String encodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.txt";
         String decodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.txt";
 
+        checkFiles(inputFile, encodedFile, decodedFile);
+
+        assert(Files.mismatch(Path.of(inputFile), Path.of(decodedFile)) == -1);
+    }
+
+
+    @Test
+    void testImage() throws IOException {
+        String inputFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\1.jpg";
+        String encodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.jpg";
+        String decodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.jpg";
+
+        checkFiles(inputFile, encodedFile, decodedFile);
+
+        assert(Files.mismatch(Path.of(inputFile), Path.of(decodedFile)) == -1);
+    }
+
+    @Test
+    void testVideo() throws IOException {
+        String inputFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\Patrick.mp4";
+        String encodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.mp4";
+        String decodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.mp4";
+
+        checkFiles(inputFile, encodedFile, decodedFile);
+
+        assert(Files.mismatch(Path.of(inputFile), Path.of(decodedFile)) == -1);
+    }
+
+    @Test
+    void testAnotherVideo() throws IOException {
+        String inputFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\song.mp4";
+        String encodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.mp4";
+        String decodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.mp4";
+
+        checkFiles(inputFile, encodedFile, decodedFile);
+
+        assert(Files.mismatch(Path.of(inputFile), Path.of(decodedFile)) == -1);
+    }
+
+    private static void checkFiles(String inputFile, String encodedFile, String decodedFile) throws IOException {
+        int bufferSize = 8;
+
         byte[] buffer = new byte[bufferSize];
         InputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile));
         OutputStream encodedFileOut = new BufferedOutputStream(new FileOutputStream(encodedFile));
-        while (inputStream.read(buffer, 0, bufferSize) > 0) {
+        while (inputStream.read(buffer, 0, bufferSize) != -1) {
+            print(BitSet.valueOf(buffer));
+
             byte[] encoded = des.encode(buffer);
+            print(BitSet.valueOf(encoded));
+
             encodedFileOut.write(encoded);
+
+            // чтобы чистить, если считаю меньше (для конца)
             for (int i = 0; i < bufferSize; i++) {
                 buffer[i] = 0;
             }
         }
+
+        System.out.println("DECODE");
 
         inputStream.close();
         encodedFileOut.close();
@@ -97,19 +141,28 @@ class DESTest {
         InputStream encodedFileIn = new BufferedInputStream(new FileInputStream(encodedFile));
         OutputStream decodedOut = new BufferedOutputStream(new FileOutputStream(decodedFile));
 
-        while ((encodedFileIn.read(buffer, 0, bufferSize)) > 0) {
-            byte[] decoded = des.decode(buffer);
-            decodedOut.write(decoded);
-            for (int i = 0; i < bufferSize; i++) {
-                buffer[i] = 0;
+        byte[] decoded = null;
+        while ((encodedFileIn.read(buffer, 0, bufferSize)) != -1) {
+            print(BitSet.valueOf(buffer));
+            if (decoded != null) {
+                decodedOut.write(decoded);
+            }
+            decoded = des.decode(buffer);
+            print(BitSet.valueOf(decoded));
+        }
+
+        int position = 0; // TODO: check null
+        for (; position < decoded.length; position++) {
+            if (decoded[position] == 0) {
+                break;
             }
         }
+        decodedOut.write(decoded, 0, position);
 
         encodedFileIn.close();
         decodedOut.close();
-
-        assert(Files.mismatch(Path.of(inputFile), Path.of(decodedFile)) == -1);
     }
+
 
     private static void print(BitSet bitSet) {
         StringBuilder s = new StringBuilder();

@@ -91,9 +91,14 @@ public final class RoundTransformerImpl implements RoundTransformer {
 
         f.xor(leftHalf);
 
-        return isLastRound
+
+        byte[] combinedArray = isLastRound
                 ? combineTwoParts(f, rightHalf).toByteArray()
                 : combineTwoParts(rightHalf, f).toByteArray();
+
+        return combinedArray.length == inputBlock64Bit.length
+                ? combinedArray
+                : increaseArrayTo64Bit(combinedArray);
     }
 
     BitSet getLeftHalf(BitSet inputBitSet) {
@@ -197,6 +202,14 @@ public final class RoundTransformerImpl implements RoundTransformer {
             combinedBitset.set(i, (i < HALF_SIZE) ? leftHalf.get(i) : rightHalf.get(i % HALF_SIZE));
         }
         return combinedBitset;
+    }
+
+    byte[] increaseArrayTo64Bit(byte[] array) {
+        byte[] increasedArray = {0, 0, 0, 0, 0, 0, 0, 0};
+        for (int i = 0; i < array.length; i++) {
+            increasedArray[i] = array[i];
+        }
+        return increasedArray;
     }
 
     private static void print(BitSet bitSet) {
