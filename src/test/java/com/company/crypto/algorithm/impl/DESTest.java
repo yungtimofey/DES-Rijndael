@@ -5,6 +5,9 @@ import com.company.crypto.round.impl.RoundTransformerImpl;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.BitSet;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -57,12 +60,55 @@ class DESTest {
     @Test
     void checkEncodeAndDecode() {
         byte[] encoded = des.encode(input64Bit);
-        print(BitSet.valueOf(encoded));
+        //print(BitSet.valueOf(encoded));
 
         byte[] decoded = des.decode(encoded);
-        print(BitSet.valueOf(decoded));
+        //print(BitSet.valueOf(decoded));
 
         assertArrayEquals(input64Bit, decoded);
+    }
+
+    @Test
+    void checkTextFile() throws IOException {
+        int bufferSize = 8;
+
+//        String inputFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\Patrick.mp4";
+//        String encodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.mp4";
+//        String decodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.mp4";
+
+        String inputFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\1.txt";
+        String encodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.txt";
+        String decodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.txt";
+
+        byte[] buffer = new byte[bufferSize];
+        InputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile));
+        OutputStream encodedFileOut = new BufferedOutputStream(new FileOutputStream(encodedFile));
+        while (inputStream.read(buffer, 0, bufferSize) > 0) {
+            byte[] encoded = des.encode(buffer);
+            encodedFileOut.write(encoded);
+            for (int i = 0; i < bufferSize; i++) {
+                buffer[i] = 0;
+            }
+        }
+
+        inputStream.close();
+        encodedFileOut.close();
+
+        InputStream encodedFileIn = new BufferedInputStream(new FileInputStream(encodedFile));
+        OutputStream decodedOut = new BufferedOutputStream(new FileOutputStream(decodedFile));
+
+        while ((encodedFileIn.read(buffer, 0, bufferSize)) > 0) {
+            byte[] decoded = des.decode(buffer);
+            decodedOut.write(decoded);
+            for (int i = 0; i < bufferSize; i++) {
+                buffer[i] = 0;
+            }
+        }
+
+        encodedFileIn.close();
+        decodedOut.close();
+
+        assert(Files.mismatch(Path.of(inputFile), Path.of(decodedFile)) == -1);
     }
 
     private static void print(BitSet bitSet) {

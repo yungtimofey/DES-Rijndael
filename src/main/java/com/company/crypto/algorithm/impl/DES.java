@@ -7,6 +7,7 @@ import com.company.crypto.round.RoundTransformer;
 import java.util.BitSet;
 
 public class DES extends FeistelNetwork {
+    private static final int OPEN_TEXT_SIZE = 64;
     private static final int[] IP = {
             58,	50,	42,	34,	26,	18,	10,	2,	60,	52,	44,	36,	28,	20,	12,	4,
             62,	54,	46,	38,	30,	22,	14,	6,	64,	56,	48,	40,	32,	24,	16,	8,
@@ -29,6 +30,10 @@ public class DES extends FeistelNetwork {
         inputBlock64Bit = IP(BitSet.valueOf(inputBlock64Bit));
         inputBlock64Bit = super.encode(inputBlock64Bit);
         inputBlock64Bit = reverseIP(BitSet.valueOf(inputBlock64Bit));
+
+        if (inputBlock64Bit.length < OPEN_TEXT_SIZE/Integer.BYTES) {
+            inputBlock64Bit = increaseArrayTo64Bit(inputBlock64Bit);
+        }
         return inputBlock64Bit;
     }
 
@@ -37,6 +42,10 @@ public class DES extends FeistelNetwork {
         inputBlock64Bit = IP(BitSet.valueOf(inputBlock64Bit));
         inputBlock64Bit = super.decode(inputBlock64Bit);
         inputBlock64Bit = reverseIP(BitSet.valueOf(inputBlock64Bit));
+
+//        if (inputBlock64Bit.length < OPEN_TEXT_SIZE/Integer.BYTES) {
+//            inputBlock64Bit = increaseArrayTo64Bit(inputBlock64Bit);
+//        }
         return inputBlock64Bit;
     }
 
@@ -49,10 +58,18 @@ public class DES extends FeistelNetwork {
     }
 
     byte[] reverseIP(BitSet inputBitset) {
-        BitSet permutedBitset = new BitSet();
+        BitSet permutedBitset = new BitSet(reverseIP.length);
         for (int i = 0; i < reverseIP.length; i++) {
             permutedBitset.set(i, inputBitset.get(reverseIP[i]-1));
         }
         return permutedBitset.toByteArray();
+    }
+
+    byte[] increaseArrayTo64Bit(byte[] array) {
+        byte[] increasedArray = {0, 0, 0, 0, 0, 0, 0, 0};
+        for (int i = 0; i < array.length; i++) {
+            increasedArray[i] = array[i];
+        }
+        return increasedArray;
     }
 }

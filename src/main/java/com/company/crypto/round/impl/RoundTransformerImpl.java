@@ -97,13 +97,17 @@ public final class RoundTransformerImpl implements RoundTransformer {
     }
 
     BitSet getLeftHalf(BitSet inputBitSet) {
-        long digit = inputBitSet.toLongArray()[0];
+        long[] inputArray = inputBitSet.toLongArray();
+        long digit = (inputArray.length == 0) ? 0 : inputArray[0];
+
         digit &= (2L << HALF_SIZE - 1) - 1;
         return BitSet.valueOf(new long[]{digit});
     }
 
     BitSet getRightHalf(BitSet inputBitSet) {
-        long digit = inputBitSet.toLongArray()[0];
+        long[] inputArray = inputBitSet.toLongArray();
+        long digit = (inputArray.length == 0) ? 0 : inputArray[0];
+
         digit = digit >> HALF_SIZE;
         digit &= (2L << HALF_SIZE) - 1;
         return BitSet.valueOf(new long[]{digit});
