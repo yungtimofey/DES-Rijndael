@@ -29,31 +29,31 @@ public class DES extends FeistelNetwork {
      * @return 64 encoded text
      */
     @Override
-    public byte[] encode(byte[] inputBlock64Bit) {
-        inputBlock64Bit = IP(BitSet.valueOf(inputBlock64Bit));
+    public byte[] encode(byte[] inputBlock) {
+        inputBlock = IP(BitSet.valueOf(inputBlock));
 
-        inputBlock64Bit = super.encode(inputBlock64Bit);
+        inputBlock = super.encode(inputBlock);
 
-        inputBlock64Bit = reverseIP(BitSet.valueOf(inputBlock64Bit));
+        inputBlock = reverseIP(BitSet.valueOf(inputBlock));
 
-        if (inputBlock64Bit.length < SIZE_OF_OPEN_TEXT_BYTE_ARRAY) {
-            inputBlock64Bit = increaseArrayTo64Bit(inputBlock64Bit);
+        if (inputBlock.length < SIZE_OF_OPEN_TEXT_BYTE_ARRAY) {
+            inputBlock = increaseArrayTo64Bit(inputBlock);
         }
-        return inputBlock64Bit;
+        return inputBlock;
     }
 
     /**
      * @return 64 bits
      */
     @Override
-    public byte[] decode(byte[] inputBlock64Bit) {
-        inputBlock64Bit = IP(BitSet.valueOf(inputBlock64Bit));
+    public byte[] decode(byte[] inputBlock) {
+        inputBlock = IP(BitSet.valueOf(inputBlock));
 
-        inputBlock64Bit = super.decode(inputBlock64Bit);
+        inputBlock = super.decode(inputBlock);
 
-        inputBlock64Bit = reverseIP(BitSet.valueOf(inputBlock64Bit));
+        inputBlock = reverseIP(BitSet.valueOf(inputBlock));
 
-        return inputBlock64Bit;
+        return inputBlock;
     }
 
     /**

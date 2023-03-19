@@ -1,13 +1,12 @@
 package com.company.crypto.mode.fabric;
 
 import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
-import com.company.crypto.mode.cypher.SymmetricalBlockCypher;
+import com.company.crypto.mode.cypher.SymmetricalBlockModeCypher;
 
 
 public interface SymmetricalBlockCypherFabric {
-    SymmetricalBlockCypher create(
+    SymmetricalBlockModeCypher create(
             SymmetricalBlockEncryptionAlgorithm algorithm,
-            byte[] key,
             Object... args
     );
 }

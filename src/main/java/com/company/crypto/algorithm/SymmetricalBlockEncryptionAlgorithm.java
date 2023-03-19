@@ -2,9 +2,10 @@ package com.company.crypto.algorithm;
 
 
 /**
- * Encode/decode 64 bit. Gets key generator and round transformer
+ * Gets open text or encoded text. Gets key generator and round transformer
  **/
 public interface SymmetricalBlockEncryptionAlgorithm {
-    byte[] decode(byte[] outputBlock64Bit);
-    byte[] encode(byte[] inputBlock64Bit);
+    byte[] decode(byte[] inputBlock);
+    byte[] encode(byte[] inputBlock);
+    void setKey(byte[] key);
 }

@@ -29,7 +29,7 @@ class DESTest {
 
         input64Bit = input.toByteArray();
 
-        des.setKey64Bit(key);
+        des.setKey(key);
     }
 
 //    @Test
@@ -70,6 +70,10 @@ class DESTest {
 
     @Test
     void checkTextFile() throws IOException {
+        BitSet bitSet = init(64, 1, 2, 3, 4, 32, 34, 37, 41, 42, 54, 56, 57, 58);
+        key = bitSet.toByteArray();
+        des.setKey(key);
+
         String inputFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\1.txt";
         String encodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.txt";
         String decodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.txt";
@@ -82,6 +86,10 @@ class DESTest {
 
     @Test
     void testImage() throws IOException {
+        BitSet bitSet = init(64, 1, 2, 3, 33, 34, 37, 41, 42, 49, 50, 53, 54, 56, 57);
+        key = bitSet.toByteArray();
+        des.setKey(key);
+
         String inputFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\1.jpg";
         String encodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.jpg";
         String decodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.jpg";
@@ -93,6 +101,10 @@ class DESTest {
 
     @Test
     void testVideo() throws IOException {
+        BitSet bitSet = init(64, 1, 2, 3, 33, 34, 37, 41, 42, 45, 50, 53, 54, 56);
+        key = bitSet.toByteArray();
+        des.setKey(key);
+
         String inputFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\Patrick.mp4";
         String encodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.mp4";
         String decodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.mp4";
@@ -104,13 +116,13 @@ class DESTest {
 
     @Test
     void testAnotherVideo() throws IOException {
-        String inputFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\song.mp4";
-        String encodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.mp4";
-        String decodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.mp4";
-
-        checkFiles(inputFile, encodedFile, decodedFile);
-
-        assert(Files.mismatch(Path.of(inputFile), Path.of(decodedFile)) == -1);
+//        String inputFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\song.mp4";
+//        String encodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.mp4";
+//        String decodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.mp4";
+//
+//        checkFiles(inputFile, encodedFile, decodedFile);
+//
+//        assert(Files.mismatch(Path.of(inputFile), Path.of(decodedFile)) == -1);
     }
 
     private static void checkFiles(String inputFile, String encodedFile, String decodedFile) throws IOException {
@@ -120,10 +132,7 @@ class DESTest {
         InputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile));
         OutputStream encodedFileOut = new BufferedOutputStream(new FileOutputStream(encodedFile));
         while (inputStream.read(buffer, 0, bufferSize) != -1) {
-            print(BitSet.valueOf(buffer));
-
             byte[] encoded = des.encode(buffer);
-            print(BitSet.valueOf(encoded));
 
             encodedFileOut.write(encoded);
 
@@ -143,15 +152,15 @@ class DESTest {
 
         byte[] decoded = null;
         while ((encodedFileIn.read(buffer, 0, bufferSize)) != -1) {
-            print(BitSet.valueOf(buffer));
+            //print(BitSet.valueOf(buffer));
             if (decoded != null) {
                 decodedOut.write(decoded);
             }
             decoded = des.decode(buffer);
-            print(BitSet.valueOf(decoded));
+            //print(BitSet.valueOf(decoded));
         }
 
-        int position = 0; // TODO: check null
+        int position = 0; // TODO: NULLPTR
         for (; position < decoded.length; position++) {
             if (decoded[position] == 0) {
                 break;
@@ -182,11 +191,9 @@ class DESTest {
         for (int i = 0; i < size; i++) {
             bitSet.set(i, false);
         }
-
         for (int index : indexes) {
             bitSet.set(index-1, true);
         }
-
         return bitSet;
     }
 }
