@@ -52,6 +52,38 @@ class CBCCypherTest {
         assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
     }
 
+    @Test
+    void encodeAndDecodeImage() throws IOException {
+        String input = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\1.jpg";
+        String encoded = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.jpg";
+        String decoded = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.jpg";
+
+        File inputFile = new File(input);
+        File encodedFile = new File(encoded);
+        File decodedFile = new File(decoded);
+
+        cypher.encode(inputFile, encodedFile);
+        cypher.decode(encodedFile, decodedFile);
+
+        assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
+    }
+
+    @Test
+    void encodeAndDecodeVideo() throws IOException {
+        String input = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\Patrick.mp4";
+        String encoded = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.mp4";
+        String decoded = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.mp4";
+
+        File inputFile = new File(input);
+        File encodedFile = new File(encoded);
+        File decodedFile = new File(decoded);
+
+        cypher.encode(inputFile, encodedFile);
+        cypher.decode(encodedFile, decodedFile);
+
+        assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
+    }
+
     private static BitSet init(int size, int ... indexes) {
         BitSet bitSet = new BitSet(size);
         for (int i = 0; i < size; i++) {

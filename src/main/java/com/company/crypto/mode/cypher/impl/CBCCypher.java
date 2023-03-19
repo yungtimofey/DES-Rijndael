@@ -42,14 +42,9 @@ public class CBCCypher implements SymmetricalBlockModeCypher {
         }
     }
     private void xor(byte[] array1, byte[] array2) {
-        BitSet bitSet1 = BitSet.valueOf(array1);
-        BitSet bitSet2 = BitSet.valueOf(array2);
-        bitSet1.xor(bitSet2);
-
-        byte[] array3 = bitSet1.toByteArray();
-
-        Arrays.fill(array1, (byte) 0);
-        System.arraycopy(array3, 0, array1, 0, array3.length);
+        for (int i = 0; i < array1.length; i++) {
+            array1[i] = (byte) (array1[i] ^ array2[i]);
+        }
     }
 
     @Override
