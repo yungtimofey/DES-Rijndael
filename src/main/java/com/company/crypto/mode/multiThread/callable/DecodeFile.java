@@ -4,6 +4,7 @@ import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
 import lombok.Builder;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 @Builder
@@ -28,7 +29,7 @@ public class DecodeFile implements Callable<Void> {
                 InputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile.getFD()));
                 OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile.getFD()));
         ) {
-            clearBuffer(buffer);
+            Arrays.fill(buffer, (byte) 0);
             boolean isFirstDecode = true;
             byte[] decoded = null;
             while (inputStream.read(buffer, 0, BUFFER_SIZE) != -1) {
@@ -55,11 +56,5 @@ public class DecodeFile implements Callable<Void> {
             }
         }
         return position;
-    }
-
-    private void clearBuffer(byte[] buffer) {
-        for (int i = 0; i < BUFFER_SIZE; i++) {
-            buffer[i] = 0;
-        }
     }
 }

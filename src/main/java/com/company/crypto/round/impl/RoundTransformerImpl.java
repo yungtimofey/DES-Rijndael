@@ -91,7 +91,6 @@ public final class RoundTransformerImpl implements RoundTransformer {
 
         f.xor(leftHalf);
 
-
         byte[] combinedArray = isLastRound
                 ? combineTwoParts(f, rightHalf).toByteArray()
                 : combineTwoParts(rightHalf, f).toByteArray();
@@ -146,7 +145,6 @@ public final class RoundTransformerImpl implements RoundTransformer {
                 boolean bit = ((sDigit >> (newGroupSize - 1 - k)) & 1) == 1;
                 reducedRightHalf.set(j++, bit);
             }
-            //print(reducedRightHalf);
         }
 
         return reducedRightHalf;
@@ -210,16 +208,5 @@ public final class RoundTransformerImpl implements RoundTransformer {
             increasedArray[i] = array[i];
         }
         return increasedArray;
-    }
-
-    private static void print(BitSet bitSet) {
-        StringBuilder s = new StringBuilder();
-        for (int i = 0; i < bitSet.length(); i++) {
-            if (i % 4 == 0 && i != 0) {
-                s.append(' ');
-            }
-            s.append(bitSet.get(i) ? 1 : 0);
-        }
-        System.out.println(s);
     }
 }

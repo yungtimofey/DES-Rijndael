@@ -5,6 +5,16 @@ import com.company.crypto.mode.cypher.SymmetricalBlockModeCypher;
 
 
 public interface SymmetricalBlockCypherFabric {
+    enum ArgPosition {
+        IV(0);
+
+        public final int position;
+        ArgPosition(int position) {
+            this.position = position;
+        }
+    }
+
+
     SymmetricalBlockModeCypher create(
             SymmetricalBlockEncryptionAlgorithm algorithm,
             Object... args

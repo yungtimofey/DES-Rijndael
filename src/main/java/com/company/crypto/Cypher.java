@@ -4,6 +4,7 @@ import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
 import com.company.crypto.mode.cypher.SymmetricalBlockModeCypher;
 import com.company.crypto.mode.SymmetricalBlockMode;
 import com.company.crypto.mode.fabric.SymmetricalBlockCypherFabric;
+import com.company.crypto.mode.fabric.impl.CBCFabric;
 import com.company.crypto.mode.fabric.impl.ECBFabric;
 
 import java.io.Closeable;
@@ -20,6 +21,7 @@ public final class Cypher implements Closeable {
     private static final Map<SymmetricalBlockMode, SymmetricalBlockCypherFabric> modeAndItsFabric = new EnumMap<>(SymmetricalBlockMode.class);
     static {
         modeAndItsFabric.put(SymmetricalBlockMode.ECB, new ECBFabric());
+        modeAndItsFabric.put(SymmetricalBlockMode.CBC, new CBCFabric());
     }
 
     public static Cypher build(byte[] key,

@@ -4,6 +4,7 @@ import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
 import lombok.Builder;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 @Builder
@@ -28,23 +29,17 @@ public class EncodeFile implements Callable<Void> {
                 InputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile.getFD()));
                 OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile.getFD()));
         ) {
-            clearBuffer(buffer);
+            Arrays.fill(buffer, (byte) 0);
             long readBytes = 0, read;
             while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1 && readBytes < byteToEncode) {
                 byte[] encoded = algorithm.encode(buffer);
                 outputStream.write(encoded);
-                clearBuffer(buffer);
+                Arrays.fill(buffer, (byte) 0);
 
                 readBytes += read;
             }
         }
 
         return null;
-    }
-
-    private void clearBuffer(byte[] buffer) {
-        for (int i = 0; i < BUFFER_SIZE; i++) {
-            buffer[i] = 0;
-        }
     }
 }

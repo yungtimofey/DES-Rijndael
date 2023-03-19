@@ -4,26 +4,21 @@ import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
 import com.company.crypto.mode.cypher.SymmetricalBlockModeCypher;
 import com.company.crypto.mode.multiThread.callable.DecodeFile;
 import com.company.crypto.mode.multiThread.callable.EncodeFile;
+import lombok.RequiredArgsConstructor;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
+@RequiredArgsConstructor
 public final class ECBCypher implements SymmetricalBlockModeCypher {
     private static final int BUFFER_SIZE = 8;
 
     private final SymmetricalBlockEncryptionAlgorithm algorithm;
 
-    private final int threadNumber;
-    private final ExecutorService executorService;
-
-    public ECBCypher(SymmetricalBlockEncryptionAlgorithm algorithm) {
-        this.algorithm = algorithm;
-
-        this.threadNumber = Runtime.getRuntime().availableProcessors()-1;
-        this.executorService = Executors.newScheduledThreadPool(threadNumber);
-    }
+    private final int threadNumber = Runtime.getRuntime().availableProcessors()-1;
+    private final ExecutorService executorService = Executors.newScheduledThreadPool(threadNumber);
 
     @Override
     public void encode(File inputFile, File outputFile) throws IOException {
@@ -32,7 +27,7 @@ public final class ECBCypher implements SymmetricalBlockModeCypher {
 
         List<Callable<Void>> callableList = new ArrayList<>();
         if (blockNumber < threadNumber || threadNumber < 2) {
-            Callable<Void> callable = EncodeFile.builder()
+            Callable<Void> encodeCallable = EncodeFile.builder()
                     .filePositionToStart(0)
                     .byteToEncode(fileLengthInByte)
                     .bufferSize(BUFFER_SIZE)
@@ -40,11 +35,11 @@ public final class ECBCypher implements SymmetricalBlockModeCypher {
                     .inputFile(new RandomAccessFile(inputFile, "r"))
                     .outputFile(new RandomAccessFile(outputFile, "rw"))
                     .build();
-            callableList.add(callable);
+            callableList.add(encodeCallable);
         } else {
             long endOfPreviousBlock = 0;
             for (int i = 0; i < threadNumber-1; i++) {
-                Callable<Void> callable = EncodeFile.builder()
+                Callable<Void> encodeCallable = EncodeFile.builder()
                         .filePositionToStart(endOfPreviousBlock)
                         .byteToEncode(blockNumber / threadNumber * BUFFER_SIZE)
                         .bufferSize(BUFFER_SIZE)
@@ -52,12 +47,12 @@ public final class ECBCypher implements SymmetricalBlockModeCypher {
                         .inputFile(new RandomAccessFile(inputFile, "r"))
                         .outputFile(new RandomAccessFile(outputFile, "rw"))
                         .build();
-                callableList.add(callable);
+                callableList.add(encodeCallable);
 
                 endOfPreviousBlock += blockNumber/threadNumber * BUFFER_SIZE;
             }
 
-            Callable<Void> callable = EncodeFile.builder()
+            Callable<Void> encodeCallable = EncodeFile.builder()
                     .filePositionToStart(endOfPreviousBlock)
                     .byteToEncode(fileLengthInByte - endOfPreviousBlock)
                     .bufferSize(BUFFER_SIZE)
@@ -65,7 +60,7 @@ public final class ECBCypher implements SymmetricalBlockModeCypher {
                     .inputFile(new RandomAccessFile(inputFile, "r"))
                     .outputFile(new RandomAccessFile(outputFile, "rw"))
                     .build();
-            callableList.add(callable);
+            callableList.add(encodeCallable);
         }
 
         callTasksAndWait(callableList);
@@ -90,7 +85,7 @@ public final class ECBCypher implements SymmetricalBlockModeCypher {
 
         List<Callable<Void>> callableList = new ArrayList<>();
         if (blockNumber < threadNumber || threadNumber < 2) {
-            Callable<Void> callable = DecodeFile.builder()
+            Callable<Void> decodeCallable = DecodeFile.builder()
                     .filePositionToStart(0)
                     .byteToEncode(fileLengthInByte)
                     .bufferSize(BUFFER_SIZE)
@@ -98,11 +93,11 @@ public final class ECBCypher implements SymmetricalBlockModeCypher {
                     .inputFile(new RandomAccessFile(inputFile, "r"))
                     .outputFile(new RandomAccessFile(outputFile, "rw"))
                     .build();
-            callableList.add(callable);
+            callableList.add(decodeCallable);
         } else {
             long endOfPreviousBlock = 0;
             for (int i = 0; i < threadNumber-1; i++) {
-                Callable<Void> callable = DecodeFile.builder()
+                Callable<Void> decodeCallable = DecodeFile.builder()
                         .filePositionToStart(endOfPreviousBlock)
                         .byteToEncode(blockNumber / threadNumber * BUFFER_SIZE)
                         .bufferSize(BUFFER_SIZE)
@@ -110,12 +105,12 @@ public final class ECBCypher implements SymmetricalBlockModeCypher {
                         .inputFile(new RandomAccessFile(inputFile, "r"))
                         .outputFile(new RandomAccessFile(outputFile, "rw"))
                         .build();
-                callableList.add(callable);
+                callableList.add(decodeCallable);
 
                 endOfPreviousBlock += blockNumber/threadNumber * BUFFER_SIZE;
             }
 
-            Callable<Void> callable = DecodeFile.builder()
+            Callable<Void> decodeCallable = DecodeFile.builder()
                     .filePositionToStart(endOfPreviousBlock)
                     .byteToEncode(fileLengthInByte - endOfPreviousBlock)
                     .bufferSize(BUFFER_SIZE)
@@ -123,7 +118,7 @@ public final class ECBCypher implements SymmetricalBlockModeCypher {
                     .inputFile(new RandomAccessFile(inputFile, "r"))
                     .outputFile(new RandomAccessFile(outputFile, "rw"))
                     .build();
-            callableList.add(callable);
+            callableList.add(decodeCallable);
         }
 
         callTasksAndWait(callableList);
@@ -133,4 +128,5 @@ public final class ECBCypher implements SymmetricalBlockModeCypher {
     public void close() {
         executorService.shutdown();
     }
+
 }
