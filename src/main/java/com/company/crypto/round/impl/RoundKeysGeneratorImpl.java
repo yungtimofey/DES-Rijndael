@@ -38,20 +38,14 @@ public final class RoundKeysGeneratorImpl implements RoundKeysGenerator {
         BitSet bitSet = BitSet.valueOf(key64Bits);
 
         BitSet leftHalfOfBitset = PC_1(bitSet, 0, PC_1_LENGTH / 2);
-        //print(leftHalfOfBitset);
 
         BitSet rightHalfOfBitset = PC_1(bitSet, PC_1_LENGTH / 2, PC_1_LENGTH);
-        //print(rightHalfOfBitset);
 
         for (int i = 0; i < ROUND_NUMBER; i++) {
             leftHalfOfBitset = leftShift(leftHalfOfBitset, bitsRotation[i]);
-            //print(leftHalfOfBitset);
-
             rightHalfOfBitset = leftShift(rightHalfOfBitset, bitsRotation[i]);
-            //print(rightHalfOfBitset);
 
             BitSet connectedBitSet = PC_2(leftHalfOfBitset, rightHalfOfBitset);
-            //print(connectedBitSet);
 
             roundKeys[i] = connectedBitSet.toByteArray();
         }
@@ -71,7 +65,6 @@ public final class RoundKeysGeneratorImpl implements RoundKeysGenerator {
 
         final int sizeOfDigit = PC_1_LENGTH / 2;
         digit = (digit >> n) | (digit << (sizeOfDigit - n));
-        //digit &= (2L << (sizeOfDigit-1)) - 1;
 
         return BitSet.valueOf(new long[]{digit});
     }
@@ -88,16 +81,5 @@ public final class RoundKeysGeneratorImpl implements RoundKeysGenerator {
             }
         }
         return bitSet;
-    }
-
-    private void print(BitSet bitSet) {
-        StringBuilder s = new StringBuilder();
-        for (int i = 0; i < bitSet.length(); i++) {
-            if (i % 4 == 0 && i != 0) {
-                s.append(' ');
-            }
-            s.append(bitSet.get(i) ? 1 : 0);
-        }
-        System.out.println(s);
     }
 }

@@ -204,9 +204,7 @@ public final class RoundTransformerImpl implements RoundTransformer {
 
     byte[] increaseArrayTo64Bit(byte[] array) {
         byte[] increasedArray = {0, 0, 0, 0, 0, 0, 0, 0};
-        for (int i = 0; i < array.length; i++) {
-            increasedArray[i] = array[i];
-        }
+        System.arraycopy(array, 0, increasedArray, 0, array.length);
         return increasedArray;
     }
 }
