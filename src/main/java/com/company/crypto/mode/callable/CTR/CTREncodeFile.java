@@ -18,6 +18,7 @@ public class CTREncodeFile implements Callable<Void> {
     private final long byteToEncode;
     private final long indexToStart;
     private final int bufferSize;
+    private final int delta;
     private final RandomAccessFile inputFile;
     private final RandomAccessFile outputFile;
     private final SymmetricalBlockEncryptionAlgorithm algorithm;
@@ -48,7 +49,7 @@ public class CTREncodeFile implements Callable<Void> {
                 Arrays.fill(buffer, (byte) 0);
 
                 allReadBytes += read;
-                i++;
+                i += delta;
             }
         }
         return null;

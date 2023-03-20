@@ -16,11 +16,13 @@ import java.util.concurrent.Callable;
 
 public class CTRCypher extends SymmetricalBlockModeCypher {
     private final int indexToStart;
+    protected int delta;
 
     public CTRCypher(SymmetricalBlockEncryptionAlgorithm algorithm, int indexToStart) {
-        super(algorithm, Runtime.getRuntime().availableProcessors()-1);
+        super(algorithm, Runtime.getRuntime().availableProcessors() - 1);
 
         this.indexToStart = indexToStart;
+        this.delta = 1;
     }
 
     @Override
@@ -34,6 +36,7 @@ public class CTRCypher extends SymmetricalBlockModeCypher {
                     .filePositionToStart(0)
                     .byteToEncode(fileLengthInByte)
                     .indexToStart(this.indexToStart)
+                    .delta(delta)
                     .bufferSize(BUFFER_SIZE)
                     .algorithm(algorithm)
                     .inputFile(new RandomAccessFile(inputFile, "r"))
@@ -42,11 +45,12 @@ public class CTRCypher extends SymmetricalBlockModeCypher {
             callableList.add(encodeCallable);
         } else {
             long endOfPreviousBlock = 0;
-            for (int i = 0; i < threadNumber-1; i++) {
+            for (int i = 0; i < threadNumber - 1; i++) {
                 Callable<Void> encodeCallable = CTREncodeFile.builder()
                         .filePositionToStart(endOfPreviousBlock)
                         .byteToEncode(blockNumber / threadNumber * BUFFER_SIZE)
-                        .indexToStart(endOfPreviousBlock/BUFFER_SIZE + indexToStart)
+                        .indexToStart(endOfPreviousBlock / BUFFER_SIZE * delta + indexToStart)
+                        .delta(delta)
                         .bufferSize(BUFFER_SIZE)
                         .algorithm(algorithm)
                         .inputFile(new RandomAccessFile(inputFile, "r"))
@@ -54,13 +58,14 @@ public class CTRCypher extends SymmetricalBlockModeCypher {
                         .build();
                 callableList.add(encodeCallable);
 
-                endOfPreviousBlock += blockNumber/threadNumber * BUFFER_SIZE;
+                endOfPreviousBlock += blockNumber / threadNumber * BUFFER_SIZE;
             }
 
             Callable<Void> encodeCallable = CTREncodeFile.builder()
                     .filePositionToStart(endOfPreviousBlock)
                     .byteToEncode(fileLengthInByte - endOfPreviousBlock)
-                    .indexToStart(endOfPreviousBlock/BUFFER_SIZE + indexToStart)
+                    .indexToStart(endOfPreviousBlock / BUFFER_SIZE * delta + indexToStart)
+                    .delta(delta)
                     .bufferSize(BUFFER_SIZE)
                     .algorithm(algorithm)
                     .inputFile(new RandomAccessFile(inputFile, "r"))
@@ -83,6 +88,7 @@ public class CTRCypher extends SymmetricalBlockModeCypher {
                     .filePositionToStart(0)
                     .byteToEncode(fileLengthInByte)
                     .indexToStart(this.indexToStart)
+                    .delta(delta)
                     .bufferSize(BUFFER_SIZE)
                     .algorithm(algorithm)
                     .inputFile(new RandomAccessFile(inputFile, "r"))
@@ -91,26 +97,28 @@ public class CTRCypher extends SymmetricalBlockModeCypher {
             callableList.add(decodeCallable);
         } else {
             long endOfPreviousBlock = 0;
-            for (int i = 0; i < threadNumber-1; i++) {
+            for (int i = 0; i < threadNumber - 1; i++) {
                 Callable<Void> decodeCallable = CTRDecodeFile.builder()
                         .filePositionToStart(endOfPreviousBlock)
                         .byteToEncode(blockNumber / threadNumber * BUFFER_SIZE)
                         .bufferSize(BUFFER_SIZE)
-                        .indexToStart(endOfPreviousBlock/BUFFER_SIZE + indexToStart)
+                        .delta(delta)
+                        .indexToStart(endOfPreviousBlock / BUFFER_SIZE * delta + indexToStart)
                         .algorithm(algorithm)
                         .inputFile(new RandomAccessFile(inputFile, "r"))
                         .outputFile(new RandomAccessFile(outputFile, "rw"))
                         .build();
                 callableList.add(decodeCallable);
 
-                endOfPreviousBlock += blockNumber/threadNumber * BUFFER_SIZE;
+                endOfPreviousBlock += blockNumber / threadNumber * BUFFER_SIZE;
             }
 
             Callable<Void> decodeCallable = CTRDecodeFile.builder()
                     .filePositionToStart(endOfPreviousBlock)
                     .byteToEncode(fileLengthInByte - endOfPreviousBlock)
                     .bufferSize(BUFFER_SIZE)
-                    .indexToStart(endOfPreviousBlock/BUFFER_SIZE + indexToStart)
+                    .delta(delta)
+                    .indexToStart(endOfPreviousBlock / BUFFER_SIZE * delta + indexToStart)
                     .algorithm(algorithm)
                     .inputFile(new RandomAccessFile(inputFile, "r"))
                     .outputFile(new RandomAccessFile(outputFile, "rw"))

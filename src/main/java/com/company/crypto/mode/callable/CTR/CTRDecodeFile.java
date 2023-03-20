@@ -17,6 +17,7 @@ public class CTRDecodeFile implements Callable<Void> {
     private final long byteToEncode;
     private final long indexToStart;
     private final int bufferSize;
+    private final int delta;
     private final RandomAccessFile inputFile;
     private final RandomAccessFile outputFile;
     private final SymmetricalBlockEncryptionAlgorithm algorithm;
@@ -43,7 +44,7 @@ public class CTRDecodeFile implements Callable<Void> {
                     isFirstDecode = false;
                 } else {
                     outputStream.write(encoded);
-                    i++;
+                    i += delta;
                 }
 
                 presentLongAsByteArray(presentedDigit, i);
@@ -79,12 +80,5 @@ public class CTRDecodeFile implements Callable<Void> {
             buffer[buffer.length - i - 1] = (byte) (digit & 0xFF);
             digit >>= Byte.SIZE;
         }
-
-//        Arrays.fill(buffer, (byte) 0);
-//        ByteBuffer byteBuffer = ByteBuffer.allocate(Long.BYTES);
-//        byteBuffer.putLong(digit);
-//
-//        byte[] array = byteBuffer.array();
-//        System.arraycopy(array, 0, buffer, 0, array.length);
     }
 }
