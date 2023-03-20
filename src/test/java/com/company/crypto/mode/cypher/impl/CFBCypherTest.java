@@ -15,8 +15,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.BitSet;
 
+import static org.junit.jupiter.api.Assertions.*;
 
-class OFBCypherTest {
+class CFBCypherTest {
     static Cypher cypher;
     static byte[] key;
     static byte[] IV;
@@ -30,7 +31,7 @@ class OFBCypherTest {
 
         cypher = Cypher.build(
                 key,
-                SymmetricalBlockMode.OFB,
+                SymmetricalBlockMode.CFB,
                 new DES(new RoundKeysGeneratorImpl(), new RoundTransformerImpl()),
                 IV
         );

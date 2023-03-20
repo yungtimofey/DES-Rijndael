@@ -6,13 +6,13 @@ import com.company.crypto.mode.cypher.SymmetricalBlockModeCypher;
 import java.io.*;
 import java.util.Arrays;
 
-
-public class OFBCypher extends SymmetricalBlockModeCypher {
+public class CFBCypher extends SymmetricalBlockModeCypher {
     private final byte[] buffer = new byte[BUFFER_SIZE];
-    private final byte[] initialVector;
+    private byte[] initialVector;
 
-    public OFBCypher(SymmetricalBlockEncryptionAlgorithm algorithm, byte[] initialVector) {
+    protected CFBCypher(SymmetricalBlockEncryptionAlgorithm algorithm, byte[] initialVector) {
         super(algorithm, 0);
+
         this.initialVector = initialVector;
     }
 
@@ -28,12 +28,12 @@ public class OFBCypher extends SymmetricalBlockModeCypher {
             Arrays.fill(buffer, (byte) 0);
             while (inputStream.read(buffer, 0, BUFFER_SIZE) != -1) {
                 byte[] encoded = algorithm.encode(toEncode);
-                System.arraycopy(encoded, 0, toEncode, 0, encoded.length);
 
                 xor(buffer, encoded);
+                System.arraycopy(buffer, 0, toEncode, 0, encoded.length);
 
-               outputStream.write(buffer);
-               Arrays.fill(buffer, (byte) 0);
+                outputStream.write(buffer);
+                Arrays.fill(buffer, (byte) 0);
             }
         }
     }
@@ -59,9 +59,9 @@ public class OFBCypher extends SymmetricalBlockModeCypher {
                 }
 
                 byte[] encoded = algorithm.encode(toEncode);
-                System.arraycopy(encoded, 0, toEncode, 0, BUFFER_SIZE);
 
                 xor(buffer, encoded);
+                System.arraycopy(buffer, 0, toEncode, 0, BUFFER_SIZE);
 
                 System.arraycopy(buffer, 0, xored, 0, BUFFER_SIZE);
             }

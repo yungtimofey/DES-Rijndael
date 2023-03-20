@@ -24,6 +24,7 @@ public final class Cypher implements Closeable {
         modeAndItsFabric.put(SymmetricalBlockMode.ECB, new ECBFabric());
         modeAndItsFabric.put(SymmetricalBlockMode.CBC, new CBCFabric());
         modeAndItsFabric.put(SymmetricalBlockMode.OFB, new OFBFabric());
+        modeAndItsFabric.put(SymmetricalBlockMode.CFB, new CBCFabric());
     }
 
     public static Cypher build(byte[] key,
