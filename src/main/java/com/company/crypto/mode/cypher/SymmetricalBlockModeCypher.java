@@ -41,6 +41,22 @@ public abstract class SymmetricalBlockModeCypher implements Closeable {
         });
     }
 
+    protected void xor(byte[] array1, byte[] array2) {
+        for (int i = 0; i < array1.length; i++) {
+            array1[i] = (byte) (array1[i] ^ array2[i]);
+        }
+    }
+
+    protected int findEndPositionOfLastDecodedBlock(byte[] decoded) {
+        int position;
+        for (position = 0; position < decoded.length; position++) {
+            if (decoded[position] == 0) {
+                break;
+            }
+        }
+        return position;
+    }
+
     @Override
     public void close() {
         if (executorService != null) {

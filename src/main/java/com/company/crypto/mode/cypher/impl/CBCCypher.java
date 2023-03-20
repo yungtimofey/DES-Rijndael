@@ -2,9 +2,7 @@ package com.company.crypto.mode.cypher.impl;
 
 import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
 import com.company.crypto.mode.callable.CBC.CBCDecodeFile;
-import com.company.crypto.mode.callable.ECB.ECBDecodeFile;
 import com.company.crypto.mode.cypher.SymmetricalBlockModeCypher;
-import lombok.RequiredArgsConstructor;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -40,11 +38,6 @@ public class CBCCypher extends SymmetricalBlockModeCypher {
 
                 toXor = encoded;
             }
-        }
-    }
-    private void xor(byte[] array1, byte[] array2) {
-        for (int i = 0; i < array1.length; i++) {
-            array1[i] = (byte) (array1[i] ^ array2[i]);
         }
     }
 

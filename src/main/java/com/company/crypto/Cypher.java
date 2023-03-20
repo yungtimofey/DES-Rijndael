@@ -6,6 +6,7 @@ import com.company.crypto.mode.SymmetricalBlockMode;
 import com.company.crypto.mode.fabric.SymmetricalBlockCypherFabric;
 import com.company.crypto.mode.fabric.impl.CBCFabric;
 import com.company.crypto.mode.fabric.impl.ECBFabric;
+import com.company.crypto.mode.fabric.impl.OFBFabric;
 
 import java.io.Closeable;
 import java.io.File;
@@ -22,6 +23,7 @@ public final class Cypher implements Closeable {
     static {
         modeAndItsFabric.put(SymmetricalBlockMode.ECB, new ECBFabric());
         modeAndItsFabric.put(SymmetricalBlockMode.CBC, new CBCFabric());
+        modeAndItsFabric.put(SymmetricalBlockMode.OFB, new OFBFabric());
     }
 
     public static Cypher build(byte[] key,
