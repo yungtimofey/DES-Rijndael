@@ -60,8 +60,9 @@ public class CFBCypher extends SymmetricalBlockModeCypher {
 
                 byte[] encoded = algorithm.encode(toEncode);
 
-                xor(buffer, encoded);
                 System.arraycopy(buffer, 0, toEncode, 0, BUFFER_SIZE);
+
+                xor(buffer, encoded);
 
                 System.arraycopy(buffer, 0, xored, 0, BUFFER_SIZE);
             }
