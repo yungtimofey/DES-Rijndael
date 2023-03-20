@@ -1,8 +1,6 @@
 package com.company.crypto.mode.cypher.impl;
 
 import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
-import com.company.crypto.mode.callable.CTR.CTRDecodeFile;
-import com.company.crypto.mode.callable.CTR.CTREncodeFile;
 import com.company.crypto.mode.callable.RDPlusH.RDPlusHEncode;
 import com.company.crypto.mode.cypher.SymmetricalBlockModeCypher;
 

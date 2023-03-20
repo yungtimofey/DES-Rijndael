@@ -4,7 +4,6 @@ import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
 import com.company.crypto.mode.cypher.SymmetricalBlockModeCypher;
 import com.company.crypto.mode.callable.ECB.ECBDecodeFile;
 import com.company.crypto.mode.callable.ECB.ECBEncodeFile;
-import lombok.RequiredArgsConstructor;
 
 import java.io.*;
 import java.util.ArrayList;

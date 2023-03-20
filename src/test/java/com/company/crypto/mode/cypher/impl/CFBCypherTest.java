@@ -15,8 +15,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.BitSet;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class CFBCypherTest {
     static Cypher cypher;
     static byte[] key;
@@ -95,7 +93,6 @@ class CFBCypherTest {
         }
         return bitSet;
     }
-
 
     @AfterAll
     static void finish() {

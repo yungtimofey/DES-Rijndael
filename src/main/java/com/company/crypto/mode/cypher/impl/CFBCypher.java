@@ -8,9 +8,9 @@ import java.util.Arrays;
 
 public class CFBCypher extends SymmetricalBlockModeCypher {
     private final byte[] buffer = new byte[BUFFER_SIZE];
-    private byte[] initialVector;
+    private final byte[] initialVector;
 
-    protected CFBCypher(SymmetricalBlockEncryptionAlgorithm algorithm, byte[] initialVector) {
+    public CFBCypher(SymmetricalBlockEncryptionAlgorithm algorithm, byte[] initialVector) {
         super(algorithm, 0);
 
         this.initialVector = initialVector;
