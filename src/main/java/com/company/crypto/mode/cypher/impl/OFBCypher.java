@@ -28,7 +28,7 @@ public class OFBCypher extends SymmetricalBlockModeCypher {
             Arrays.fill(buffer, (byte) 0);
             while (inputStream.read(buffer, 0, BUFFER_SIZE) != -1) {
                 byte[] encoded = algorithm.encode(toEncode);
-                System.arraycopy(encoded, 0, toEncode, 0, encoded.length);
+                toEncode = encoded;
 
                 xor(buffer, encoded);
 
@@ -59,7 +59,7 @@ public class OFBCypher extends SymmetricalBlockModeCypher {
                 }
 
                 byte[] encoded = algorithm.encode(toEncode);
-                System.arraycopy(encoded, 0, toEncode, 0, BUFFER_SIZE);
+                toEncode = encoded;
 
                 xor(buffer, encoded);
 
