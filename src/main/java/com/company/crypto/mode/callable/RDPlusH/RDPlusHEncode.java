@@ -1,14 +1,15 @@
-package com.company.crypto.mode.callable.RD;
+package com.company.crypto.mode.callable.RDPlusH;
 
 import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
 import lombok.Builder;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.concurrent.Callable;
 
 @Builder
-public class RDDecode implements Callable<Void> {
+public class RDPlusHEncode implements Callable<Void> {
     private static final int BUFFER_SIZE = 8;
 
     private final byte[] buffer = new byte[BUFFER_SIZE];
@@ -18,6 +19,7 @@ public class RDDecode implements Callable<Void> {
     private final long indexToStart;
     private final int bufferSize;
     private final int delta;
+    private final byte[] hash;
     private final RandomAccessFile inputFile;
     private final RandomAccessFile outputFile;
     private final SymmetricalBlockEncryptionAlgorithm algorithm;
@@ -34,41 +36,43 @@ public class RDDecode implements Callable<Void> {
             Arrays.fill(buffer, (byte) 0);
 
             long i = indexToStart;
-            boolean isFirstDecode = true;
-            byte[] encoded = null;
+            long allReadBytes = 0;
+            long read;
+
+            byte[] previousOpenBlock = new byte[BUFFER_SIZE];
+            getPreviousOpenBlock(previousOpenBlock, inputStream);
+            Arrays.fill(buffer, (byte) 0);
 
             byte[] presentedDigit = new byte[BUFFER_SIZE];
-            long allReadBytes = 0, read;
             while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1 && allReadBytes <= byteToEncode) {
-                if (isFirstDecode) {
-                    isFirstDecode = false;
-                } else {
-                    outputStream.write(encoded);
-                    i += delta;
-                }
-
                 presentLongAsByteArray(presentedDigit, i);
-                encoded = algorithm.encode(presentedDigit);
-                xor(encoded, buffer);
+                byte[] encoded = algorithm.encode(presentedDigit);
+
+                xor(buffer, encoded);
+                xor(buffer, previousOpenBlock);
+                outputStream.write(buffer);
+
+                Arrays.fill(buffer, (byte) 0);
 
                 allReadBytes += read;
-            }
-            if (encoded != null) {
-                int position = findEndPositionOfLastDecodedBlock(encoded);
-                outputStream.write(encoded, 0, position);
+                i += delta;
             }
         }
         return null;
     }
-    private int findEndPositionOfLastDecodedBlock(byte[] decoded) {
-        int position;
-        for (position = 0; position < decoded.length; position++) {
-            if (decoded[position] == 0) {
-                break;
-            }
+
+    private void getPreviousOpenBlock(byte[] previousOpenBlock, InputStream inputStream) throws IOException {
+        if (inputFile.getFilePointer() == 0) {
+            System.arraycopy(hash, 0, previousOpenBlock, 0, BUFFER_SIZE);
         }
-        return position;
+
+        inputFile.seek(inputFile.getFilePointer() - BUFFER_SIZE);
+        if (inputStream.read(buffer, 0, BUFFER_SIZE) != BUFFER_SIZE) {
+            throw new IllegalArgumentException("Wrong file position!");
+        }
+        System.arraycopy(hash, 0, buffer, 0, BUFFER_SIZE);
     }
+
     private void xor(byte[] buffer, byte[] array) {
         for (int i = 0; i < BUFFER_SIZE; i++) {
             buffer[i] = (byte) (buffer[i] ^ array[i]);

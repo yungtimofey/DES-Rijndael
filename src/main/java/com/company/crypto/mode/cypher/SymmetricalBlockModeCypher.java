@@ -6,6 +6,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -55,6 +56,14 @@ public abstract class SymmetricalBlockModeCypher implements Closeable {
             }
         }
         return position;
+    }
+
+    protected void presentLongAsByteArray(byte[] buffer, long digit) {
+        Arrays.fill(buffer, (byte) 0);
+        for (int i = 0; i < buffer.length; i++) {
+            buffer[buffer.length - i - 1] = (byte) (digit & 0xFF);
+            digit >>= Byte.SIZE;
+        }
     }
 
     @Override

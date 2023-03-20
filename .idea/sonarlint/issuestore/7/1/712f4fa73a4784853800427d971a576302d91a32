@@ -1,0 +1,13 @@
+
+V
+java:S1854"9Remove this useless assignment to local variable "array".(Şğäø8¨áÎûï0
+‰
+java:S1130
+"lRemove the declaration of thrown exception 'java.io.IOException', as it cannot be thrown from method's body.(œû¿Ø8¨áÎûï0
+G
+java:S1481"*Remove this unused "array" local variable.(Şğäø8¨áÎûï0
+Z	java:S106"9Replace this use of System.out or System.err by a logger.(ªÓ¼áşÿÿÿÿ8¨áÎûï0
+O
+java:S1128"-Remove this unused import 'java.util.BitSet'.(‹¸ÚÁıÿÿÿÿ8¨áÎûï0
+H
+java:S1144",Remove this unused private "makeSum" method.(”“¼8¨áÎûï0

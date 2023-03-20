@@ -15,7 +15,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.BitSet;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 class RDCypherTest {
     static Cypher cypher;

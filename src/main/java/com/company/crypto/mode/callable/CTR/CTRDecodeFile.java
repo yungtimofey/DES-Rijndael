@@ -15,7 +15,7 @@ public class CTRDecodeFile implements Callable<Void> {
 
     private final long filePositionToStart;
     private final long byteToEncode;
-    private final long indexToStart;
+    private final long startDigit;
     private final int bufferSize;
     private final int delta;
     private final RandomAccessFile inputFile;
@@ -33,7 +33,7 @@ public class CTRDecodeFile implements Callable<Void> {
         ) {
             Arrays.fill(buffer, (byte) 0);
 
-            long i = indexToStart;
+            long i = startDigit;
             boolean isFirstDecode = true;
             byte[] encoded = null;
 

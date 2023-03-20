@@ -71,7 +71,6 @@ public class CTRCypher extends SymmetricalBlockModeCypher {
                     .build();
             callableList.add(encodeCallable);
         }
-
         callTasksAndWait(callableList);
     }
 
@@ -85,7 +84,7 @@ public class CTRCypher extends SymmetricalBlockModeCypher {
             Callable<Void> decodeCallable = CTRDecodeFile.builder()
                     .filePositionToStart(0)
                     .byteToEncode(fileLengthInByte)
-                    .indexToStart(this.startDigit)
+                    .startDigit(this.startDigit)
                     .delta(delta)
                     .bufferSize(BUFFER_SIZE)
                     .algorithm(algorithm)
@@ -101,7 +100,7 @@ public class CTRCypher extends SymmetricalBlockModeCypher {
                         .byteToEncode(blockNumber / threadNumber * BUFFER_SIZE)
                         .bufferSize(BUFFER_SIZE)
                         .delta(delta)
-                        .indexToStart(endOfPreviousBlock / BUFFER_SIZE * delta + startDigit)
+                        .startDigit(endOfPreviousBlock / BUFFER_SIZE * delta + startDigit)
                         .algorithm(algorithm)
                         .inputFile(new RandomAccessFile(inputFile, "r"))
                         .outputFile(new RandomAccessFile(outputFile, "rw"))
@@ -116,14 +115,13 @@ public class CTRCypher extends SymmetricalBlockModeCypher {
                     .byteToEncode(fileLengthInByte - endOfPreviousBlock)
                     .bufferSize(BUFFER_SIZE)
                     .delta(delta)
-                    .indexToStart(endOfPreviousBlock / BUFFER_SIZE * delta + startDigit)
+                    .startDigit(endOfPreviousBlock / BUFFER_SIZE * delta + startDigit)
                     .algorithm(algorithm)
                     .inputFile(new RandomAccessFile(inputFile, "r"))
                     .outputFile(new RandomAccessFile(outputFile, "rw"))
                     .build();
             callableList.add(decodeCallable);
         }
-
         callTasksAndWait(callableList);
     }
 }

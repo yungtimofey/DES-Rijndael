@@ -65,12 +65,5 @@ public class CTREncodeFile implements Callable<Void> {
             buffer[buffer.length - i - 1] = (byte) (digit & 0xFF);
             digit >>= Byte.SIZE;
         }
-
-//        Arrays.fill(buffer, (byte) 0);
-//        ByteBuffer byteBuffer = ByteBuffer.allocate(Long.BYTES);
-//        byteBuffer.putLong(digit);
-//
-//        byte[] array = byteBuffer.array();
-//        System.arraycopy(array, 0, buffer, 0, array.length);
     }
 }
