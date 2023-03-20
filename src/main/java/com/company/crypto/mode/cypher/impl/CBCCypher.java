@@ -1,13 +1,16 @@
 package com.company.crypto.mode.cypher.impl;
 
 import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
+import com.company.crypto.mode.callable.CBC.CBCDecodeFile;
+import com.company.crypto.mode.callable.ECB.ECBDecodeFile;
 import com.company.crypto.mode.cypher.SymmetricalBlockModeCypher;
 import lombok.RequiredArgsConstructor;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.List;
+import java.util.concurrent.*;
 
 @RequiredArgsConstructor
 public class CBCCypher implements SymmetricalBlockModeCypher {
@@ -48,42 +51,62 @@ public class CBCCypher implements SymmetricalBlockModeCypher {
 
     @Override
     public void decode(File inputFile, File outputFile) throws IOException {
-        try (
-                InputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile));
-                OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
-        ) {
-            Arrays.fill(buffer, (byte) 0);
-            boolean isFirstDecode = true;
-            byte[] decoded = null;
+        long fileLengthInByte = inputFile.length();
+        long blockNumber = fileLengthInByte / BUFFER_SIZE;
 
-            byte[] toXor, previousBuffer = initialVector;
-            while (inputStream.read(buffer, 0, BUFFER_SIZE) != -1) {
-                if (isFirstDecode) {
-                    isFirstDecode = false;
-                } else {
-                    outputStream.write(decoded);
-                }
+        List<Callable<Void>> callableList = new ArrayList<>();
+        if (blockNumber < threadNumber || threadNumber < 2) {
+            Callable<Void> decodeCallable = CBCDecodeFile.builder()
+                    .filePositionToStart(0)
+                    .byteToEncode(fileLengthInByte)
+                    .bufferSize(BUFFER_SIZE)
+                    .initialVector(initialVector)
+                    .algorithm(algorithm)
+                    .inputFile(new RandomAccessFile(inputFile, "r"))
+                    .outputFile(new RandomAccessFile(outputFile, "rw"))
+                    .build();
+            callableList.add(decodeCallable);
+        } else {
+            long endOfPreviousBlock = 0;
+            for (int i = 0; i < threadNumber-1; i++) {
+                Callable<Void> decodeCallable = CBCDecodeFile.builder()
+                        .filePositionToStart(endOfPreviousBlock)
+                        .byteToEncode(blockNumber / threadNumber * BUFFER_SIZE)
+                        .bufferSize(BUFFER_SIZE)
+                        .initialVector(initialVector)
+                        .algorithm(algorithm)
+                        .inputFile(new RandomAccessFile(inputFile, "r"))
+                        .outputFile(new RandomAccessFile(outputFile, "rw"))
+                        .build();
+                callableList.add(decodeCallable);
 
-                decoded = algorithm.decode(buffer);
-
-                toXor = previousBuffer;
-                xor(decoded, toXor);
-                System.arraycopy(buffer, 0, previousBuffer, 0, decoded.length);
+                endOfPreviousBlock += blockNumber/threadNumber * BUFFER_SIZE;
             }
-            if (decoded != null) {
-                int position = findEndPositionOfLastDecodedBlock(decoded);
-                outputStream.write(decoded, 0, position);
-            }
+
+            Callable<Void> decodeCallable = CBCDecodeFile.builder()
+                    .filePositionToStart(endOfPreviousBlock)
+                    .byteToEncode(fileLengthInByte - endOfPreviousBlock)
+                    .bufferSize(BUFFER_SIZE)
+                    .initialVector(initialVector)
+                    .algorithm(algorithm)
+                    .inputFile(new RandomAccessFile(inputFile, "r"))
+                    .outputFile(new RandomAccessFile(outputFile, "rw"))
+                    .build();
+            callableList.add(decodeCallable);
         }
+        callTasksAndWait(callableList);
     }
-    private int findEndPositionOfLastDecodedBlock(byte[] decoded) {
-        int position;
-        for (position = 0; position < decoded.length; position++) {
-            if (decoded[position] == 0) {
-                break;
+
+    private void callTasksAndWait(List<Callable<Void>> callableList) {
+        List<Future<Void>> futureList = new ArrayList<>();
+        callableList.forEach(encodeCallable -> futureList.add(executorService.submit(encodeCallable)));
+        futureList.forEach(future -> {
+            try {
+                future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
             }
-        }
-        return position;
+        });
     }
 
     @Override

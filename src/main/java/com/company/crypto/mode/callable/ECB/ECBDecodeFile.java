@@ -1,4 +1,4 @@
-package com.company.crypto.mode.multiThread.callable;
+package com.company.crypto.mode.callable.ECB;
 
 import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
 import lombok.Builder;
@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 @Builder
-public class EncodeFile implements Callable<Void> {
+public class ECBDecodeFile implements Callable<Void> {
     private static final int BUFFER_SIZE = 8;
 
     private final byte[] buffer = new byte[BUFFER_SIZE];
@@ -30,16 +30,31 @@ public class EncodeFile implements Callable<Void> {
                 OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile.getFD()));
         ) {
             Arrays.fill(buffer, (byte) 0);
-            long readBytes = 0, read;
-            while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1 && readBytes < byteToEncode) {
-                byte[] encoded = algorithm.encode(buffer);
-                outputStream.write(encoded);
-                Arrays.fill(buffer, (byte) 0);
-
-                readBytes += read;
+            boolean isFirstDecode = true;
+            byte[] decoded = null;
+            while (inputStream.read(buffer, 0, BUFFER_SIZE) != -1) {
+                if (isFirstDecode) {
+                    isFirstDecode = false;
+                } else {
+                    outputStream.write(decoded);
+                }
+                decoded = algorithm.decode(buffer);
+            }
+            if (decoded != null) {
+                int position = findEndPositionOfLastDecodedBlock(decoded);
+                outputStream.write(decoded, 0, position);
             }
         }
-
         return null;
+    }
+
+    private int findEndPositionOfLastDecodedBlock(byte[] decoded) {
+        int position;
+        for (position = 0; position < decoded.length; position++) {
+            if (decoded[position] == 0) {
+                break;
+            }
+        }
+        return position;
     }
 }

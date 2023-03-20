@@ -1,0 +1,7 @@
+
+W	java:S8997";Do something with the "boolean" value returned by "delete".(љПЄЗ8ќХђвя0
+k
+java:S40427"NUse "java.nio.file.Files#delete" here for better messages on error conditions.(љПЄЗ8ќХђвя0
+W	java:S899?";Do something with the "boolean" value returned by "delete".(љПЄЗ8ќХђвя0
+k
+java:S4042?"NUse "java.nio.file.Files#delete" here for better messages on error conditions.(љПЄЗ8ќХђвя0
