@@ -70,10 +70,6 @@ public final class Cypher implements Closeable {
 
     @Override
     public void close() {
-        try {
-            symmetricalBlockCypher.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        symmetricalBlockCypher.close();
     }
 }

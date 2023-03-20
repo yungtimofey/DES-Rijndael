@@ -12,16 +12,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
 
-@RequiredArgsConstructor
-public class CBCCypher extends SymmetricalBlockModeCypher {
-    private static final int BUFFER_SIZE = 8;
 
-    private final SymmetricalBlockEncryptionAlgorithm algorithm;
+public class CBCCypher extends SymmetricalBlockModeCypher {
+    private final byte[] buffer = new byte[BUFFER_SIZE];
     private final byte[] initialVector;
 
-    private final int threadNumber = Runtime.getRuntime().availableProcessors()-1;
-    private final ExecutorService executorService = Executors.newScheduledThreadPool(threadNumber);
-    private final byte[] buffer = new byte[BUFFER_SIZE];
+    public CBCCypher(SymmetricalBlockEncryptionAlgorithm algorithm, byte[] initialVector) {
+        super(algorithm, Runtime.getRuntime().availableProcessors()-1);
+        this.initialVector = initialVector;
+    }
 
     @Override
     public void encode(File inputFile, File outputFile) throws IOException {

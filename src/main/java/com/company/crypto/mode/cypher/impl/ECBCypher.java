@@ -11,14 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
-@RequiredArgsConstructor
+
 public final class ECBCypher extends SymmetricalBlockModeCypher {
-    private static final int BUFFER_SIZE = 8;
-
-    private final SymmetricalBlockEncryptionAlgorithm algorithm;
-
-    private final int threadNumber = Runtime.getRuntime().availableProcessors()-1;
-    private final ExecutorService executorService = Executors.newScheduledThreadPool(threadNumber);
+    public ECBCypher(SymmetricalBlockEncryptionAlgorithm algorithm) {
+        super(algorithm, Runtime.getRuntime().availableProcessors()-1);
+    }
 
     @Override
     public void encode(File inputFile, File outputFile) throws IOException {
