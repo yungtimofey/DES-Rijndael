@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 @RequiredArgsConstructor
-public final class ECBCypher implements SymmetricalBlockModeCypher {
+public final class ECBCypher extends SymmetricalBlockModeCypher {
     private static final int BUFFER_SIZE = 8;
 
     private final SymmetricalBlockEncryptionAlgorithm algorithm;
@@ -66,17 +66,6 @@ public final class ECBCypher implements SymmetricalBlockModeCypher {
         callTasksAndWait(callableList);
 
     }
-    private void callTasksAndWait(List<Callable<Void>> callableList) {
-        List<Future<Void>> futureList = new ArrayList<>();
-        callableList.forEach(encodeCallable -> futureList.add(executorService.submit(encodeCallable)));
-        futureList.forEach(future -> {
-            try {
-                future.get();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
-    }
 
     @Override
     public void decode(File inputFile, File outputFile) throws IOException {
@@ -124,9 +113,5 @@ public final class ECBCypher implements SymmetricalBlockModeCypher {
         callTasksAndWait(callableList);
     }
 
-    @Override
-    public void close() {
-        executorService.shutdown();
-    }
 
 }

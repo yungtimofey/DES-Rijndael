@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 @RequiredArgsConstructor
-public class CBCCypher implements SymmetricalBlockModeCypher {
+public class CBCCypher extends SymmetricalBlockModeCypher {
     private static final int BUFFER_SIZE = 8;
 
     private final SymmetricalBlockEncryptionAlgorithm algorithm;
@@ -95,22 +95,5 @@ public class CBCCypher implements SymmetricalBlockModeCypher {
             callableList.add(decodeCallable);
         }
         callTasksAndWait(callableList);
-    }
-
-    private void callTasksAndWait(List<Callable<Void>> callableList) {
-        List<Future<Void>> futureList = new ArrayList<>();
-        callableList.forEach(encodeCallable -> futureList.add(executorService.submit(encodeCallable)));
-        futureList.forEach(future -> {
-            try {
-                future.get();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
-    @Override
-    public void close() {
-        executorService.shutdown();
     }
 }
