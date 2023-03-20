@@ -39,7 +39,8 @@ public class CBCDecodeFile implements Callable<Void> {
             System.arraycopy(getInitialVector(inputStream), 0, previousBuffer, 0, BUFFER_SIZE);
 
             Arrays.fill(buffer, (byte) 0);
-            while (inputStream.read(buffer, 0, BUFFER_SIZE) != -1) {
+            long allReadBytes = 0, read;
+            while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1 && allReadBytes < byteToEncode) {
                 if (isFirstDecode) {
                     isFirstDecode = false;
                 } else {
@@ -51,6 +52,8 @@ public class CBCDecodeFile implements Callable<Void> {
                 toXor = previousBuffer;
                 xor(decoded, toXor);
                 System.arraycopy(buffer, 0, previousBuffer, 0, decoded.length);
+
+                allReadBytes += read;
             }
             if (decoded != null) {
                 int position = findEndPositionOfLastDecodedBlock(decoded);

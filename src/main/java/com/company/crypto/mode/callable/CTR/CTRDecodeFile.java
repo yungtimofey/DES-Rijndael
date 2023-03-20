@@ -34,21 +34,27 @@ public class CTRDecodeFile implements Callable<Void> {
 
             long i = indexToStart;
             boolean isFirstDecode = true;
-            byte[] decoded = null;
+            byte[] encoded = null;
 
-            while (inputStream.read(buffer, 0, BUFFER_SIZE) != -1) {
+            byte[] presentedDigit = new byte[BUFFER_SIZE];
+            long allReadBytes = 0, read;
+            while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1 && allReadBytes <= byteToEncode) {
                 if (isFirstDecode) {
                     isFirstDecode = false;
                 } else {
-                    makeSum(decoded, i);
-                    outputStream.write(decoded);
+                    outputStream.write(encoded);
                     i++;
                 }
-                decoded = algorithm.decode(buffer);
+
+                presentLongAsByteArray(presentedDigit, i);
+                encoded = algorithm.encode(presentedDigit);
+                xor(encoded, buffer);
+
+                allReadBytes += read;
             }
-            if (decoded != null) {
-                int position = findEndPositionOfLastDecodedBlock(decoded);
-                outputStream.write(decoded, 0, position);
+            if (encoded != null) {
+                int position = findEndPositionOfLastDecodedBlock(encoded);
+                outputStream.write(encoded, 0, position);
             }
         }
         return null;
@@ -62,7 +68,23 @@ public class CTRDecodeFile implements Callable<Void> {
         }
         return position;
     }
-    private void makeSum(byte[] buffer, long i) {
+    private void xor(byte[] buffer, byte[] array) {
+        for (int i = 0; i < BUFFER_SIZE; i++) {
+            buffer[i] = (byte) (buffer[i] ^ array[i]);
+        }
+    }
+    private void presentLongAsByteArray(byte[] buffer, long digit) {
+        Arrays.fill(buffer, (byte) 0);
+        for (int i = 0; i < buffer.length; i++) {
+            buffer[buffer.length - i - 1] = (byte) (digit & 0xFF);
+            digit >>= Byte.SIZE;
+        }
 
+//        Arrays.fill(buffer, (byte) 0);
+//        ByteBuffer byteBuffer = ByteBuffer.allocate(Long.BYTES);
+//        byteBuffer.putLong(digit);
+//
+//        byte[] array = byteBuffer.array();
+//        System.arraycopy(array, 0, buffer, 0, array.length);
     }
 }

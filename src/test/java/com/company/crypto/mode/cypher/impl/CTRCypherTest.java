@@ -30,7 +30,7 @@ class CTRCypherTest {
                 key,
                 SymmetricalBlockMode.CTR,
                 new DES(new RoundKeysGeneratorImpl(), new RoundTransformerImpl()),
-                null, 1
+                null, 2
         );
     }
 
@@ -82,21 +82,21 @@ class CTRCypherTest {
         assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
     }
 
-//    @Test
-//    void encodeAndDecodeLongVideo() throws IOException {
-//        String input = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\Song.mp4";
-//        String encoded = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.mp4";
-//        String decoded = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.mp4";
-//
-//        File inputFile = new File(input);
-//        File encodedFile = new File(encoded);
-//        File decodedFile = new File(decoded);
-//
-//        cypher.encode(inputFile, encodedFile);
-//        cypher.decode(encodedFile, decodedFile);
-//
-//        assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
-//    }
+    @Test
+    void encodeAndDecodeLongVideo() throws IOException {
+        String input = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\Song.mp4";
+        String encoded = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.mp4";
+        String decoded = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.mp4";
+
+        File inputFile = new File(input);
+        File encodedFile = new File(encoded);
+        File decodedFile = new File(decoded);
+
+        cypher.encode(inputFile, encodedFile);
+        cypher.decode(encodedFile, decodedFile);
+
+        assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
+    }
 
     private static BitSet init(int size, int ... indexes) {
         BitSet bitSet = new BitSet(size);
