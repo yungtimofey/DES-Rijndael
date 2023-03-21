@@ -41,7 +41,7 @@ public class CBCDecodeFile implements Callable<Void> {
 
             Arrays.fill(buffer, (byte) 0);
             long allReadBytes = 0, read;
-            while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1 && allReadBytes < byteToEncode) {
+            while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1 && allReadBytes <= byteToEncode) {
                 if (isFirstDecode) {
                     isFirstDecode = false;
                 } else {
