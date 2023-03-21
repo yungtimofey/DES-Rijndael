@@ -119,7 +119,7 @@ public class RDPlusHCypher extends SymmetricalBlockModeCypher {
                 xor(encoded, previousOpenBlock);
             }
             if (!isFirstDecode) {
-                int position = PKCS7.doDepadding(encoded);
+                int position = PKCS7.getPositionOfFinishByte(encoded);
                 outputStream.write(encoded, 0, position);
             }
         }

@@ -1,17 +1,23 @@
 package com.company.crypto.padding;
 
 public class PKCS7 {
-    public static void doPadding(byte[] array) {
-
+    public static void doPadding(byte[] array, int bytesForPadding) {
+        int byteToStart = array.length - bytesForPadding;
+        for (int i = byteToStart; i < array.length; i++) {
+            array[i] = (byte) bytesForPadding;
+        }
     }
+    public static int getPositionOfFinishByte(byte[] decoded) {
+        byte lastByte = decoded[decoded.length-1];
+        if (lastByte < 0 || lastByte >= decoded.length) {
+            return decoded.length;
+        }
 
-    public static int doDepadding(byte[] decoded) {
-        int position;
-        for (position = 0; position < decoded.length; position++) {
-            if (decoded[position] == 0) {
-                break;
+        for (int i = 0; i >= lastByte; i++) {
+            if (decoded[decoded.length - 1 - i] != lastByte) {
+                return decoded.length;
             }
         }
-        return position;
+        return decoded.length - lastByte;
     }
 }

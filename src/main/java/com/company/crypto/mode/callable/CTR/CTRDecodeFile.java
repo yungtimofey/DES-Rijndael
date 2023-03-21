@@ -55,7 +55,7 @@ public class CTRDecodeFile implements Callable<Void> {
                 allReadBytes += read;
             }
             if (!isFirstDecode) {
-                int position = PKCS7.doDepadding(encoded);
+                int position = PKCS7.getPositionOfFinishByte(encoded);
                 outputStream.write(encoded, 0, position);
             }
         }

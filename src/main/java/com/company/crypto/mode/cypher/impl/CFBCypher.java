@@ -30,7 +30,7 @@ public class CFBCypher extends SymmetricalBlockModeCypher {
             Arrays.fill(buffer, (byte) 0);
             while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1) {
                 if (read < BUFFER_SIZE) {
-                    PKCS7.doPadding(buffer);
+                    PKCS7.doPadding(buffer, (int) (BUFFER_SIZE - read));
                 }
 
                 byte[] encoded = algorithm.encode(toEncode);
@@ -73,7 +73,7 @@ public class CFBCypher extends SymmetricalBlockModeCypher {
                 System.arraycopy(buffer, 0, xored, 0, BUFFER_SIZE);
             }
             if (!isFirstDecode) {
-                int position = PKCS7.doDepadding(xored);
+                int position = PKCS7.getPositionOfFinishByte(xored);
                 outputStream.write(xored, 0, position);
             }
         }

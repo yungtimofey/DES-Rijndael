@@ -6,7 +6,6 @@ import lombok.Builder;
 
 import java.io.*;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.concurrent.Callable;
 
 @Builder
@@ -47,7 +46,7 @@ public class ECBDecodeFile implements Callable<Void> {
                 allReadBytes += read;
             }
             if (!isFirstDecode) {
-                int position = PKCS7.doDepadding(decoded);
+                int position = PKCS7.getPositionOfFinishByte(decoded);
                 outputStream.write(decoded, 0, position);
             }
         }

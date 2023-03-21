@@ -37,7 +37,7 @@ public class ECBEncodeFile implements Callable<Void> {
             long read;
             while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1 && allReadBytes <= byteToEncode) {
                 if (read < BUFFER_SIZE) {
-                    PKCS7.doPadding(buffer);
+                    PKCS7.doPadding(buffer, (int) (BUFFER_SIZE - read));
                 }
 
                 byte[] encoded = algorithm.encode(buffer);
