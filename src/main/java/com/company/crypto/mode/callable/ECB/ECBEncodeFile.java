@@ -6,6 +6,7 @@ import lombok.Builder;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.concurrent.Callable;
 
 @Builder
@@ -48,4 +49,7 @@ public class ECBEncodeFile implements Callable<Void> {
         }
         return null;
     }
+
+
+
 }

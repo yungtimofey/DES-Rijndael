@@ -26,8 +26,6 @@ Ksrc/test/java/com/company/crypto/round/impl/RoundKeysGeneratorImplTest.java,a\
 pom.xml,4\4\442292b8a7efeabbe4cc176709b833b1792140ec
 l
 <src/main/java/com/company/crypto/round/RoundTransformer.java,1\6\1617392ceeee8c776e3f6d08a89d6061cc933c1d
-l
-<src/test/java/com/company/crypto/algorithm/impl/DESTest.java,0\f\0fa1dddee5578f1b3e0c983735f4a215418b96e4
 ~
 Nsrc/main/java/com/company/crypto/mode/fabric/SymmetricalBlockCypherFabric.java,9\f\9fcfbe47d5933f927db84bbd4598a71a2b48fc0d
 h
