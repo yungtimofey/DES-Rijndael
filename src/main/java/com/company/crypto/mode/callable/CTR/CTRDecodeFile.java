@@ -32,8 +32,6 @@ public class CTRDecodeFile implements Callable<Void> {
                 InputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile.getFD()));
                 OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile.getFD()));
         ) {
-            Arrays.fill(buffer, (byte) 0);
-
             long i = startDigit;
             boolean isFirstDecode = true;
             byte[] encoded = null;

@@ -5,7 +5,6 @@ import com.company.crypto.padding.PKCS7;
 import lombok.Builder;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 @Builder
@@ -31,7 +30,6 @@ public class CBCDecodeFile implements Callable<Void> {
                 InputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile.getFD()));
                 OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile.getFD()));
         ) {
-            Arrays.fill(buffer, (byte) 0);
             boolean isFirstDecode = true;
             byte[] decoded = null;
 
@@ -39,8 +37,8 @@ public class CBCDecodeFile implements Callable<Void> {
             byte[] previousBuffer = new byte[BUFFER_SIZE];
             System.arraycopy(getInitialVector(inputStream), 0, previousBuffer, 0, BUFFER_SIZE);
 
-            Arrays.fill(buffer, (byte) 0);
-            long allReadBytes = 0, read;
+            long read;
+            long allReadBytes = 0;
             while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1 && allReadBytes <= byteToEncode) {
                 if (isFirstDecode) {
                     isFirstDecode = false;

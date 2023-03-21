@@ -32,8 +32,6 @@ public class CTREncodeFile implements Callable<Void> {
                 InputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile.getFD()));
                 OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile.getFD()));
         ) {
-            Arrays.fill(buffer, (byte) 0);
-
             long i = indexToStart;
             long allReadBytes = 0;
             long read;
@@ -49,8 +47,6 @@ public class CTREncodeFile implements Callable<Void> {
 
                 xor(buffer, encoded);
                 outputStream.write(buffer);
-
-                Arrays.fill(buffer, (byte) 0);
 
                 allReadBytes += read;
                 i += delta;

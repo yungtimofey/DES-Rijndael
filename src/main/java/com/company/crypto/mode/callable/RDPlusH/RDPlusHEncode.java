@@ -33,15 +33,12 @@ public class RDPlusHEncode implements Callable<Void> {
                 InputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile.getFD()));
                 OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile.getFD()));
         ) {
-            Arrays.fill(buffer, (byte) 0);
-
             long i = indexToStart;
             long allReadBytes = 0;
             long read;
 
             byte[] previousOpenBlock = new byte[BUFFER_SIZE];
             getPreviousOpenBlock(previousOpenBlock, inputStream);
-            Arrays.fill(buffer, (byte) 0);
 
             byte[] presentedDigit = new byte[BUFFER_SIZE];
             while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1 && allReadBytes <= byteToEncode) {
@@ -56,7 +53,6 @@ public class RDPlusHEncode implements Callable<Void> {
                 xor(buffer, previousOpenBlock);
                 outputStream.write(buffer);
 
-                Arrays.fill(buffer, (byte) 0);
                 allReadBytes += read;
                 i += delta;
             }

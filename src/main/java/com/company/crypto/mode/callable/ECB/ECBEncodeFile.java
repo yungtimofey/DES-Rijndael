@@ -31,8 +31,6 @@ public class ECBEncodeFile implements Callable<Void> {
                 InputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile.getFD()));
                 OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile.getFD()));
         ) {
-            Arrays.fill(buffer, (byte) 0);
-
             long allReadBytes = 0;
             long read;
             while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1 && allReadBytes <= byteToEncode) {
@@ -42,7 +40,6 @@ public class ECBEncodeFile implements Callable<Void> {
 
                 byte[] encoded = algorithm.encode(buffer);
                 outputStream.write(encoded);
-                Arrays.fill(buffer, (byte) 0);
 
                 allReadBytes += read;
             }

@@ -30,7 +30,6 @@ public class CBCCypher extends SymmetricalBlockModeCypher {
             byte[] toXor = initialVector;
             long read;
 
-            Arrays.fill(buffer, (byte) 0);
             while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1) {
                 if (read < BUFFER_SIZE) {
                     PKCS7.doPadding(buffer, (int) (BUFFER_SIZE - read));
@@ -40,7 +39,6 @@ public class CBCCypher extends SymmetricalBlockModeCypher {
                 byte[] encoded = algorithm.encode(buffer);
 
                 outputStream.write(encoded);
-                Arrays.fill(buffer, (byte) 0);
 
                 toXor = encoded;
             }

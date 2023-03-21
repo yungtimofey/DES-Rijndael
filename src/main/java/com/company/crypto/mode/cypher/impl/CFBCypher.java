@@ -27,7 +27,6 @@ public class CFBCypher extends SymmetricalBlockModeCypher {
             System.arraycopy(initialVector, 0, toEncode, 0, initialVector.length);
 
             long read;
-            Arrays.fill(buffer, (byte) 0);
             while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1) {
                 if (read < BUFFER_SIZE) {
                     PKCS7.doPadding(buffer, (int) (BUFFER_SIZE - read));
@@ -39,7 +38,6 @@ public class CFBCypher extends SymmetricalBlockModeCypher {
                 System.arraycopy(buffer, 0, toEncode, 0, encoded.length);
 
                 outputStream.write(buffer);
-                Arrays.fill(buffer, (byte) 0);
             }
         }
     }
@@ -50,8 +48,6 @@ public class CFBCypher extends SymmetricalBlockModeCypher {
                 InputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile));
                 OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
         ) {
-            Arrays.fill(buffer, (byte) 0);
-
             byte[] xored = new byte[BUFFER_SIZE];
             byte[] toEncode = new byte[BUFFER_SIZE];
             System.arraycopy(initialVector, 0, toEncode, 0, initialVector.length);

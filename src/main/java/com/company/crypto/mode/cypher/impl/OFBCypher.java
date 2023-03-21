@@ -27,7 +27,6 @@ public class OFBCypher extends SymmetricalBlockModeCypher {
             System.arraycopy(initialVector, 0, toEncode, 0, initialVector.length);
 
             long read;
-            Arrays.fill(buffer, (byte) 0);
             while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1) {
                 if (read < BUFFER_SIZE) {
                     PKCS7.doPadding(buffer, (int) (BUFFER_SIZE - read));
@@ -39,7 +38,6 @@ public class OFBCypher extends SymmetricalBlockModeCypher {
                 xor(buffer, encoded);
 
                outputStream.write(buffer);
-               Arrays.fill(buffer, (byte) 0);
             }
         }
     }

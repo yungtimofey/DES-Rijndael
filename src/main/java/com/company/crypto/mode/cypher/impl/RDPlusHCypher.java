@@ -93,8 +93,6 @@ public class RDPlusHCypher extends SymmetricalBlockModeCypher {
                 InputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile));
                 OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
         ) {
-            Arrays.fill(buffer, (byte) 0);
-
             long i = startDigit;
             boolean isFirstDecode = true;
             byte[] encoded = null;
