@@ -1,6 +1,7 @@
 package com.company.crypto.mode.callable.ECB;
 
 import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
+import com.company.crypto.padding.PKCS7;
 import lombok.Builder;
 
 import java.io.*;
@@ -30,8 +31,14 @@ public class ECBEncodeFile implements Callable<Void> {
                 OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile.getFD()));
         ) {
             Arrays.fill(buffer, (byte) 0);
-            long allReadBytes = 0, read;
+
+            long allReadBytes = 0;
+            long read;
             while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1 && allReadBytes <= byteToEncode) {
+                if (read < BUFFER_SIZE) {
+                    PKCS7.doPadding(buffer);
+                }
+
                 byte[] encoded = algorithm.encode(buffer);
                 outputStream.write(encoded);
                 Arrays.fill(buffer, (byte) 0);
@@ -39,7 +46,6 @@ public class ECBEncodeFile implements Callable<Void> {
                 allReadBytes += read;
             }
         }
-
         return null;
     }
 }

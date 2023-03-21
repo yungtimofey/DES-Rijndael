@@ -1,6 +1,7 @@
 package com.company.crypto.mode.callable.ECB;
 
 import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
+import com.company.crypto.padding.PKCS7;
 import lombok.Builder;
 
 import java.io.*;
@@ -44,21 +45,11 @@ public class ECBDecodeFile implements Callable<Void> {
 
                 allReadBytes += read;
             }
-            if (decoded != null) {
-                int position = findEndPositionOfLastDecodedBlock(decoded);
+            if (!isFirstDecode) {
+                int position = PKCS7.doDepadding(decoded);
                 outputStream.write(decoded, 0, position);
             }
         }
         return null;
-    }
-
-    private int findEndPositionOfLastDecodedBlock(byte[] decoded) {
-        int position;
-        for (position = 0; position < decoded.length; position++) {
-            if (decoded[position] == 0) {
-                break;
-            }
-        }
-        return position;
     }
 }

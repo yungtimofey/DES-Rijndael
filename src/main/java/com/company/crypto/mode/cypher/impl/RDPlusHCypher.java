@@ -3,6 +3,7 @@ package com.company.crypto.mode.cypher.impl;
 import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
 import com.company.crypto.mode.callable.RDPlusH.RDPlusHEncode;
 import com.company.crypto.mode.cypher.SymmetricalBlockModeCypher;
+import com.company.crypto.padding.PKCS7;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -117,8 +118,8 @@ public class RDPlusHCypher extends SymmetricalBlockModeCypher {
                 xor(encoded, buffer);
                 xor(encoded, previousOpenBlock);
             }
-            if (encoded != null) {
-                int position = findEndPositionOfLastDecodedBlock(encoded);
+            if (!isFirstDecode) {
+                int position = PKCS7.doDepadding(encoded);
                 outputStream.write(encoded, 0, position);
             }
         }

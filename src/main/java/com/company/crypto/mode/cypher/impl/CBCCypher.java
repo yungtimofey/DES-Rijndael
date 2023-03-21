@@ -3,6 +3,7 @@ package com.company.crypto.mode.cypher.impl;
 import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
 import com.company.crypto.mode.callable.CBC.CBCDecodeFile;
 import com.company.crypto.mode.cypher.SymmetricalBlockModeCypher;
+import com.company.crypto.padding.PKCS7;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -27,9 +28,14 @@ public class CBCCypher extends SymmetricalBlockModeCypher {
                 OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
         ) {
             byte[] toXor = initialVector;
+            long read;
 
             Arrays.fill(buffer, (byte) 0);
-            while (inputStream.read(buffer, 0, BUFFER_SIZE) != -1) {
+            while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1) {
+                if (read < BUFFER_SIZE) {
+                    PKCS7.doPadding(buffer);
+                }
+
                 xor(buffer, toXor);
                 byte[] encoded = algorithm.encode(buffer);
 

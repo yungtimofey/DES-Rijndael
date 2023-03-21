@@ -1,6 +1,7 @@
 package com.company.crypto.mode.callable.CTR;
 
 import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
+import com.company.crypto.padding.PKCS7;
 import lombok.Builder;
 
 import java.io.*;
@@ -53,21 +54,12 @@ public class CTRDecodeFile implements Callable<Void> {
 
                 allReadBytes += read;
             }
-            if (encoded != null) {
-                int position = findEndPositionOfLastDecodedBlock(encoded);
+            if (!isFirstDecode) {
+                int position = PKCS7.doDepadding(encoded);
                 outputStream.write(encoded, 0, position);
             }
         }
         return null;
-    }
-    private int findEndPositionOfLastDecodedBlock(byte[] decoded) {
-        int position;
-        for (position = 0; position < decoded.length; position++) {
-            if (decoded[position] == 0) {
-                break;
-            }
-        }
-        return position;
     }
     private void xor(byte[] buffer, byte[] array) {
         for (int i = 0; i < BUFFER_SIZE; i++) {

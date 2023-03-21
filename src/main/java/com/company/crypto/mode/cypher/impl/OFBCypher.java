@@ -2,6 +2,7 @@ package com.company.crypto.mode.cypher.impl;
 
 import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
 import com.company.crypto.mode.cypher.SymmetricalBlockModeCypher;
+import com.company.crypto.padding.PKCS7;
 
 import java.io.*;
 import java.util.Arrays;
@@ -25,8 +26,13 @@ public class OFBCypher extends SymmetricalBlockModeCypher {
             byte[] toEncode = new byte[BUFFER_SIZE];
             System.arraycopy(initialVector, 0, toEncode, 0, initialVector.length);
 
+            long read;
             Arrays.fill(buffer, (byte) 0);
-            while (inputStream.read(buffer, 0, BUFFER_SIZE) != -1) {
+            while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1) {
+                if (read < BUFFER_SIZE) {
+                    PKCS7.doPadding(buffer);
+                }
+
                 byte[] encoded = algorithm.encode(toEncode);
                 toEncode = encoded;
 
@@ -66,7 +72,7 @@ public class OFBCypher extends SymmetricalBlockModeCypher {
                 System.arraycopy(buffer, 0, xored, 0, BUFFER_SIZE);
             }
             if (!isFirstDecode) {
-                int position = findEndPositionOfLastDecodedBlock(xored);
+                int position = PKCS7.doDepadding(xored);
                 outputStream.write(xored, 0, position);
             }
         }
