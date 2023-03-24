@@ -278,6 +278,6 @@ class ECBCypherTest {
     static void finish() {
         if (cypher != null) {
             cypher.close();
-        }
+        }ooooooooooooooooooooooooooooooooo
     }
 }

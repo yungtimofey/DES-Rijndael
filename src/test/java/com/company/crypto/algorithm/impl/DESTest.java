@@ -160,7 +160,7 @@ class DESTest {
             //print(BitSet.valueOf(decoded));
         }
 
-        int position = 0; // TODO: NULLPTR
+        int position = 0;
         for (; position < decoded.length; position++) {
             if (decoded[position] == 0) {
                 break;
