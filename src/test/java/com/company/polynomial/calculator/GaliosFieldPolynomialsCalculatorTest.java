@@ -7,19 +7,24 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 class GaliosFieldPolynomialsCalculatorTest {
-    static GaloisFieldPolynomialsCalculator galoisFieldPolynomialsCalculator;
+    static GaloisFieldPolynomialsCalculatorImpl galoisFieldPolynomialsCalculator;
+
     @BeforeAll
     static void init() throws WrongIrreduciblePolynomialException {
-        galoisFieldPolynomialsCalculator = GaloisFieldPolynomialsCalculator.getInstance(283);
+        galoisFieldPolynomialsCalculator = GaloisFieldPolynomialsCalculatorImpl.getInstance(283);
     }
 
     @Test
-    void checkMultiClassExample() {
-        byte polynomial = galoisFieldPolynomialsCalculator.multi((byte) 87, (byte) 131);
-        String polynomialStr = GaloisFieldPolynomialsCalculator.polynomialToString(polynomial);
+    void checkConverter() {
+        byte digit = -103;
+        String digitStr = GaloisFieldPolynomialsCalculator.polynomialToString(digit);
 
-        assert (polynomialStr.equals("11000001"));
+        int digitInt = GaloisFieldPolynomialsCalculator.convertByteToInt(digit);
+        String intDigitStr = GaloisFieldPolynomialsCalculator.polynomialToString(digitInt);
+
+        assert (digitStr.equals(intDigitStr));
     }
+
 
     @Test
     void checkIrreduciblePolynomials() {
@@ -29,30 +34,50 @@ class GaliosFieldPolynomialsCalculatorTest {
 
     @Test
     void checkCorrectIrreducibleTest() {
-        byte ans = GaloisFieldPolynomialsCalculator.mod(155, 31);
+        byte ans = GaloisFieldPolynomialsCalculatorImpl.mod(155, 31);
         assert (ans == 0);
     }
 
     @Test
-    void checkReverse() {
-        GaloisFieldPolynomialsCalculator.EEATuple eea = galoisFieldPolynomialsCalculator.EEA(150, 283);
+    void checkMulti() {
+        int firstDigit = 87;
+        int secondDigit = 131;
 
-        byte firstMulti = galoisFieldPolynomialsCalculator.multi((byte) 150, (byte) eea.x);
-        byte secondMulti = galoisFieldPolynomialsCalculator.multi((byte) 283, (byte) eea.y);
+        byte firstDigitByte = GaloisFieldPolynomialsCalculator.convertIntToByte(firstDigit);
+        byte secondDigitByte = GaloisFieldPolynomialsCalculator.convertIntToByte(secondDigit);
 
-        assert (galoisFieldPolynomialsCalculator.sum(firstMulti, secondMulti) == 1);
+        byte multy = galoisFieldPolynomialsCalculator.multi(firstDigitByte, secondDigitByte);
+        int converted = GaloisFieldPolynomialsCalculator.convertByteToInt(multy);
 
+        String digit = GaloisFieldPolynomialsCalculator.polynomialToString(converted);
+        assert (digit.equals("11000001"));
     }
 
     @Test
     void checkDiv() {
-        int polynomial = galoisFieldPolynomialsCalculator.multiPolynomials((byte) 87, (byte) 131);
-        //System.out.println(GaloisFieldPolynomialsCalculator.polynomialToString(polynomial));
+        int firstDigit = 87;
+        int secondDigit = 131;
 
-        byte ans = galoisFieldPolynomialsCalculator.div(polynomial, 283);
-        String polynomialStr = GaloisFieldPolynomialsCalculator.polynomialToString(ans);
-        //System.out.println(polynomialStr);
 
-        assert (polynomialStr.equals("00101000"));
+        int multied = galoisFieldPolynomialsCalculator.multiPolynomials(firstDigit, secondDigit);
+        int div = galoisFieldPolynomialsCalculator.div(multied, 283);
+        String digit = GaloisFieldPolynomialsCalculator.polynomialToString(div);
+        assert (digit.equals("101000"));
+    }
+
+    @Test
+    void checkReverse() {
+        for (int i = 1; i < 256; i++) {
+            byte digit = GaloisFieldPolynomialsCalculator.convertIntToByte(i);
+            byte reversed = galoisFieldPolynomialsCalculator.getReverse(digit);
+
+            if (galoisFieldPolynomialsCalculator.multi(digit, reversed) != 1) {
+                //System.out.println("false");
+                assert(false);
+                return;
+            }
+        }
+        //System.out.println("true");
+        assert (true);
     }
 }
