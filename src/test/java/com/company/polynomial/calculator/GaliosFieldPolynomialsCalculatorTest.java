@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.BitSet;
+import java.util.List;
 
 class GaliosFieldPolynomialsCalculatorTest {
     static GaloisFieldPolynomialsCalculator galoisFieldPolynomialsCalculator;
@@ -21,5 +22,17 @@ class GaliosFieldPolynomialsCalculatorTest {
         assert (polynomialStr.equals("11000001"));
     }
 
+    @Test
+    void checkIrreduciblePolynomials() {
+        List<Integer> list = galoisFieldPolynomialsCalculator.getAllIrreduciblePolynomials();
+        list.forEach(polynomial -> {
+            System.out.println(GaloisFieldPolynomialsCalculator.polynomialToString(polynomial));
+        });
+    }
 
+    @Test
+    void checkCorrectIrreducibleTest() {
+        byte answ = GaloisFieldPolynomialsCalculator.mod(155, 31);
+        System.out.println(answ);
+    }
 }
