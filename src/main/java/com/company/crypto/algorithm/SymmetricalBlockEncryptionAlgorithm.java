@@ -7,5 +7,5 @@ package com.company.crypto.algorithm;
 public interface SymmetricalBlockEncryptionAlgorithm {
     byte[] decode(byte[] inputBlock);
     byte[] encode(byte[] inputBlock);
-    void setKey(byte[] key);
+    void setKey(byte[] cipherKey);
 }

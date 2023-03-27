@@ -32,10 +32,10 @@ public final class RoundKeysGeneratorDES implements RoundKeysGenerator {
     private static final int[] bitsRotation = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
 
     @Override
-    public byte[][] generate(byte[] key) {
+    public byte[][] generate(byte[] cipherKey64Bit) {
         byte[][] roundKeys = new byte[ROUND_NUMBER][OUTPUT_KEY_LENGTH / BITS_IN_BYTE];
 
-        BitSet bitSet = BitSet.valueOf(key);
+        BitSet bitSet = BitSet.valueOf(cipherKey64Bit);
 
         BitSet leftHalfOfBitset = PC_1(bitSet, 0, PC_1_LENGTH / 2);
 

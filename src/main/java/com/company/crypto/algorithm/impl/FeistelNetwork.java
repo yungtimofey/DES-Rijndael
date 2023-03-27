@@ -11,7 +11,7 @@ class FeistelNetwork implements SymmetricalBlockEncryptionAlgorithm {
 
     private final RoundKeysGenerator roundKeysGenerator;
     private final RoundTransformer roundTransformer;
-    private byte[] key64Bit;
+    private byte[] cipherKey64Bit;
 
     public FeistelNetwork(RoundKeysGenerator roundKeysGenerator, RoundTransformer roundTransformer) {
         this.roundKeysGenerator = roundKeysGenerator;
@@ -20,10 +20,10 @@ class FeistelNetwork implements SymmetricalBlockEncryptionAlgorithm {
 
     @Override
     public byte[] encode(byte[] inputBlock) {
-        Objects.requireNonNull(key64Bit);
+        Objects.requireNonNull(cipherKey64Bit);
         Objects.requireNonNull(inputBlock);
 
-        byte[][] roundKeys = roundKeysGenerator.generate(key64Bit);
+        byte[][] roundKeys = roundKeysGenerator.generate(cipherKey64Bit);
         for (int i = 0; i < ROUND_NUMBER; i++) {
             byte[] roundKey = roundKeys[i];
             inputBlock = roundTransformer.encode(inputBlock, roundKey, i == ROUND_NUMBER-1);
@@ -33,10 +33,10 @@ class FeistelNetwork implements SymmetricalBlockEncryptionAlgorithm {
 
     @Override
     public byte[] decode(byte[] inputBlock) {
-        Objects.requireNonNull(key64Bit);
+        Objects.requireNonNull(cipherKey64Bit);
         Objects.requireNonNull(inputBlock);
 
-        byte[][] roundKeys = roundKeysGenerator.generate(key64Bit);
+        byte[][] roundKeys = roundKeysGenerator.generate(cipherKey64Bit);
         for (int i = ROUND_NUMBER-1; i >= 0; i--) {
             byte[] roundKey = roundKeys[i];
             inputBlock = roundTransformer.decode(inputBlock, roundKey, i == 0);
@@ -45,7 +45,7 @@ class FeistelNetwork implements SymmetricalBlockEncryptionAlgorithm {
     }
 
     @Override
-    public void setKey(byte[] key) {
-        this.key64Bit = key;
+    public void setKey(byte[] cipherKey) {
+        this.cipherKey64Bit = cipherKey;
     }
 }
