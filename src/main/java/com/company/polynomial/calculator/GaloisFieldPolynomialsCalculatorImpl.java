@@ -9,20 +9,9 @@ import java.util.Set;
 import java.util.stream.IntStream;
 
 /**
- * 2^8 Galois field calculator
+ * 2^8 Galois field calculator. 283 irreducible polynomial default
  **/
-
-// TODO: Надо правильно конвертировать byte в int 10101111 -> 000....0000.10101111
-
-
 public final class GaloisFieldPolynomialsCalculatorImpl implements GaloisFieldPolynomialsCalculator {
-    public static GaloisFieldPolynomialsCalculatorImpl getInstance(int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
-        if (!polynomialIsIrreducible(irreduciblePolynomial)) {
-            throw new WrongIrreduciblePolynomialException();
-        }
-        return new GaloisFieldPolynomialsCalculatorImpl(irreduciblePolynomial);
-    }
-
     static boolean polynomialIsIrreducible(int polynomial) {
         if (polynomial < 2) {
             return false;
@@ -68,12 +57,9 @@ public final class GaloisFieldPolynomialsCalculatorImpl implements GaloisFieldPo
         return degree - 1;
     }
 
-
-    private final int irreduciblePolynomial;
     private final Set<Integer> allIrreduciblePolynomials = new HashSet<>();
 
-    private GaloisFieldPolynomialsCalculatorImpl(int irreduciblePolynomial) {
-        this.irreduciblePolynomial = irreduciblePolynomial;
+    public GaloisFieldPolynomialsCalculatorImpl() {
         initIrreduciblePolynomialsSet();
     }
 
@@ -99,7 +85,7 @@ public final class GaloisFieldPolynomialsCalculatorImpl implements GaloisFieldPo
 
 
     @Override
-    public byte multi(byte firstPolynomial, byte secondPolynomial) {
+    public byte multi(byte firstPolynomial, byte secondPolynomial, int irreduciblePolynomial) {
         int firstPolynomialInt = GaloisFieldPolynomialsCalculator.convertByteToInt(firstPolynomial);
         int secondPolynomialInt = GaloisFieldPolynomialsCalculator.convertByteToInt(secondPolynomial);
 
@@ -116,7 +102,7 @@ public final class GaloisFieldPolynomialsCalculatorImpl implements GaloisFieldPo
 
 
     @Override
-    public byte getReverse(byte polynomial) {
+    public byte getReverse(byte polynomial, int irreduciblePolynomial) {
         if (polynomial == 0) {
             return 0;
         }

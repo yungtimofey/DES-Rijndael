@@ -96,6 +96,22 @@ class ECBCypherTest {
         assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
     }
 
+    @Test
+    void encodeAndDecodeSong() throws IOException {
+        String input = "kenny.mp3";
+        String encoded = "2.mp3";
+        String decoded = "3.mp3";
+
+        File inputFile = new File(input);
+        File encodedFile = new File(encoded);
+        File decodedFile = new File(decoded);
+
+        cypher.encode(inputFile, encodedFile);
+        cypher.decode(encodedFile, decodedFile);
+
+        assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
+    }
+
     private static BitSet init(int size, int ... indexes) {
         BitSet bitSet = new BitSet(size);
         for (int i = 0; i < size; i++) {

@@ -13,7 +13,7 @@ public class PKCS7 {
             return decoded.length;
         }
 
-        for (int i = 0; i >= lastByte; i++) {
+        for (int i = 0; i >= lastByte && (decoded.length - 1 - i) > 0; i++) {
             if (decoded[decoded.length - 1 - i] != lastByte) {
                 return decoded.length;
             }
