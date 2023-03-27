@@ -3,8 +3,8 @@ package com.company.crypto.mode.cypher.impl;
 import com.company.crypto.Cypher;
 import com.company.crypto.algorithm.impl.DES;
 import com.company.crypto.mode.SymmetricalBlockMode;
-import com.company.crypto.round.impl.RoundKeysGeneratorImpl;
-import com.company.crypto.round.impl.RoundTransformerImpl;
+import com.company.crypto.round.impl.RoundKeysGeneratorDES;
+import com.company.crypto.round.impl.RoundTransformerDES;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ class CBCCypherTest {
         cypher = Cypher.build(
                 key,
                 SymmetricalBlockMode.CBC,
-                new DES(new RoundKeysGeneratorImpl(), new RoundTransformerImpl()),
+                new DES(new RoundKeysGeneratorDES(), new RoundTransformerDES()),
                 IV
         );
     }

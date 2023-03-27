@@ -1,7 +1,7 @@
 package com.company.crypto.algorithm.impl;
 
-import com.company.crypto.round.impl.RoundKeysGeneratorImpl;
-import com.company.crypto.round.impl.RoundTransformerImpl;
+import com.company.crypto.round.impl.RoundKeysGeneratorDES;
+import com.company.crypto.round.impl.RoundTransformerDES;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ class DESTest {
 
     @BeforeAll
     public static void init() {
-        des = new DES(new RoundKeysGeneratorImpl(), new RoundTransformerImpl());
+        des = new DES(new RoundKeysGeneratorDES(), new RoundTransformerDES());
 
         BitSet bitSet = init(64, 25, 26, 30, 33, 34, 37, 41, 42, 49, 50, 53, 54, 56, 57, 58);
         key = bitSet.toByteArray();

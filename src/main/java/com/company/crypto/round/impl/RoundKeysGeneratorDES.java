@@ -4,7 +4,7 @@ import com.company.crypto.round.RoundKeysGenerator;
 
 import java.util.BitSet;
 
-public final class RoundKeysGeneratorImpl implements RoundKeysGenerator {
+public final class RoundKeysGeneratorDES implements RoundKeysGenerator {
     private static final int OUTPUT_KEY_LENGTH = 48;
     private static final int PC_1_LENGTH = 56;
     private static final int ROUND_NUMBER = 16;
@@ -32,10 +32,10 @@ public final class RoundKeysGeneratorImpl implements RoundKeysGenerator {
     private static final int[] bitsRotation = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
 
     @Override
-    public byte[][] generate(byte[] key64Bits) {
+    public byte[][] generate(byte[] key) {
         byte[][] roundKeys = new byte[ROUND_NUMBER][OUTPUT_KEY_LENGTH / BITS_IN_BYTE];
 
-        BitSet bitSet = BitSet.valueOf(key64Bits);
+        BitSet bitSet = BitSet.valueOf(key);
 
         BitSet leftHalfOfBitset = PC_1(bitSet, 0, PC_1_LENGTH / 2);
 

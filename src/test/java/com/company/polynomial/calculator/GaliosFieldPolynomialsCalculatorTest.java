@@ -72,12 +72,10 @@ class GaliosFieldPolynomialsCalculatorTest {
             byte reversed = galoisFieldPolynomialsCalculator.getReverse(digit);
 
             if (galoisFieldPolynomialsCalculator.multi(digit, reversed) != 1) {
-                //System.out.println("false");
                 assert(false);
                 return;
             }
         }
-        //System.out.println("true");
         assert (true);
     }
 }

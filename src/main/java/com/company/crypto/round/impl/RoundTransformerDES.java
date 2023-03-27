@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
-public final class RoundTransformerImpl implements RoundTransformer {
+public final class RoundTransformerDES extends RoundTransformer {
     private static final int HALF_SIZE = 32;
     private static final int[] E = {
             32, 1, 2, 3, 4, 5,
@@ -76,16 +76,26 @@ public final class RoundTransformerImpl implements RoundTransformer {
     };
 
     @Override
-    public byte[] doRound(byte[] inputBlock64Bit, byte[] roundKey56Bit, boolean isLastRound) {
-        BitSet inputBitSet = BitSet.valueOf(inputBlock64Bit);
+    public byte[] encode(byte[] inputBlock, byte[] roundKey, boolean isLastRound) {
+        return doRound(inputBlock, roundKey, isLastRound);
+    }
+
+    @Override
+    public byte[] decode(byte[] inputBlock, byte[] roundKey, boolean isLastRound) {
+        return doRound(inputBlock, roundKey, isLastRound);
+    }
+
+    byte[] doRound(byte[] inputBlock, byte[] roundKey, boolean isLastRound) {
+        BitSet inputBitSet = BitSet.valueOf(inputBlock);
         BitSet rightHalf = getRightHalf(inputBitSet);
         BitSet leftHalf = getLeftHalf(inputBitSet);
 
         BitSet expandedRightHalf = expandHalf(rightHalf);
-        expandedRightHalf.xor(BitSet.valueOf(roundKey56Bit));
+        expandedRightHalf.xor(BitSet.valueOf(roundKey));
 
-        final int currentGroupSize = 6, newGroupSize = 4;
-        BitSet f = reduceXoredHalf(expandedRightHalf, currentGroupSize, newGroupSize);
+        final int currentGroupSize = 6;
+        final int newGroupSize = 4;
+        BitSet f = sPermutation(expandedRightHalf, currentGroupSize, newGroupSize);
 
         f = lastPermutation(f);
 
@@ -95,7 +105,7 @@ public final class RoundTransformerImpl implements RoundTransformer {
                 ? combineTwoParts(f, rightHalf).toByteArray()
                 : combineTwoParts(rightHalf, f).toByteArray();
 
-        return combinedArray.length == inputBlock64Bit.length
+        return combinedArray.length == inputBlock.length
                 ? combinedArray
                 : increaseArrayTo64Bit(combinedArray);
     }
@@ -125,7 +135,8 @@ public final class RoundTransformerImpl implements RoundTransformer {
         return expandedRightHalf;
     }
 
-    BitSet reduceXoredHalf(BitSet expandedHalf, int currentGroupSize, int newGroupSize) {
+    @Override
+    protected BitSet sPermutation(BitSet expandedHalf, int currentGroupSize, int newGroupSize) {
         final int columnBits = 2;
         final int rowSize = 1 << (currentGroupSize - columnBits);
 
@@ -146,7 +157,6 @@ public final class RoundTransformerImpl implements RoundTransformer {
                 reducedRightHalf.set(j++, bit);
             }
         }
-
         return reducedRightHalf;
     }
 

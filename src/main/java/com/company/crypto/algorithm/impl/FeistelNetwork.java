@@ -26,7 +26,7 @@ class FeistelNetwork implements SymmetricalBlockEncryptionAlgorithm {
         byte[][] roundKeys = roundKeysGenerator.generate(key64Bit);
         for (int i = 0; i < ROUND_NUMBER; i++) {
             byte[] roundKey = roundKeys[i];
-            inputBlock = roundTransformer.doRound(inputBlock, roundKey, i == ROUND_NUMBER-1);
+            inputBlock = roundTransformer.encode(inputBlock, roundKey, i == ROUND_NUMBER-1);
         }
         return inputBlock;
     }
@@ -39,7 +39,7 @@ class FeistelNetwork implements SymmetricalBlockEncryptionAlgorithm {
         byte[][] roundKeys = roundKeysGenerator.generate(key64Bit);
         for (int i = ROUND_NUMBER-1; i >= 0; i--) {
             byte[] roundKey = roundKeys[i];
-            inputBlock = roundTransformer.doRound(inputBlock, roundKey, i == 0);
+            inputBlock = roundTransformer.decode(inputBlock, roundKey, i == 0);
         }
         return inputBlock;
     }

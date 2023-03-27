@@ -12,11 +12,11 @@ class RoundTransformerImplTest {
     static byte[][] arrayKey;
     static byte[] input64Bit;
     static BitSet input, leftAnswer, rightAnswer;
-    static RoundTransformerImpl roundTransformer = new RoundTransformerImpl();
+    static RoundTransformerDES roundTransformer = new RoundTransformerDES();
 
     @BeforeAll
     static void generateKey() {
-        RoundKeysGenerator roundKeysGenerator = new RoundKeysGeneratorImpl();
+        RoundKeysGenerator roundKeysGenerator = new RoundKeysGeneratorDES();
         BitSet bitSet = init(64, 25, 26, 30, 33, 34, 37, 41, 42, 49, 50, 53, 54, 56, 57, 58);
         byte[] key = bitSet.toByteArray();
         arrayKey = roundKeysGenerator.generate(key);
@@ -82,7 +82,7 @@ class RoundTransformerImplTest {
 
         right.xor(BitSet.valueOf(arrayKey[0]));
 
-        BitSet xored = roundTransformer.reduceXoredHalf(right, 6, 4);
+        BitSet xored = roundTransformer.sPermutation(right, 6, 4);
 
         BitSet answer = init(32, 1, 2, 5, 6, 7, 8, 10, 11, 14, 15, 16, 17, 18, 19, 24, 25, 26, 27, 28, 29, 30, 31, 32);
         assertArrayEquals(xored.toByteArray(), answer.toByteArray());
@@ -95,7 +95,7 @@ class RoundTransformerImplTest {
 
         right.xor(BitSet.valueOf(arrayKey[0]));
 
-        BitSet xored = roundTransformer.reduceXoredHalf(right, 6, 4);
+        BitSet xored = roundTransformer.sPermutation(right, 6, 4);
         BitSet last = roundTransformer.lastPermutation(xored);
 
         BitSet ans = init(32, 1, 2, 5, 7, 8, 9, 10, 12, 13, 14, 15, 16,
@@ -111,7 +111,7 @@ class RoundTransformerImplTest {
 
         right.xor(BitSet.valueOf(arrayKey[0]));
 
-        BitSet xored = roundTransformer.reduceXoredHalf(right, 6, 4);
+        BitSet xored = roundTransformer.sPermutation(right, 6, 4);
         BitSet left = init(32, 1, 2, 3, 4, 5, 6, 10, 11, 18, 20, 22, 26);
 
         BitSet combined = roundTransformer.combineTwoParts(left, xored);

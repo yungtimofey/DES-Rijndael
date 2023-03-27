@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class RoundKeysGeneratorImplTest {
     @Test
     public void firstTest() {
-        RoundKeysGenerator roundKeysGenerator = new RoundKeysGeneratorImpl();
+        RoundKeysGenerator roundKeysGenerator = new RoundKeysGeneratorDES();
         byte[][] array;
 
         BitSet bitSet = init(64, 25, 26, 30, 33, 34, 37, 41, 42, 49, 50, 53, 54, 56, 57, 58);
