@@ -1,5 +1,6 @@
 package com.company.polynomial.calculator;
 
+import com.company.polynomial.exception.WrongIrreduciblePolynomialException;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
@@ -16,11 +17,13 @@ public interface GaloisFieldPolynomialsCalculator {
 
     byte minus(byte firstPolynomial, byte secondPolynomial);
 
-    byte multi(byte firstPolynomial, byte secondPolynomial, int irreduciblePolynomial);
+    byte multi(byte firstPolynomial, byte secondPolynomial);
 
     List<Integer> getAllIrreduciblePolynomials();
 
-    byte getReverse(byte polynomial, int irreduciblePolynomial);
+    byte getReverse(byte polynomial);
+
+    void setIrreduciblePolynomial(int irreduciblePolynomial) throws WrongIrreduciblePolynomialException;
 
     static byte convertIntToByte(int polynomial) {
         byte converted = 0;

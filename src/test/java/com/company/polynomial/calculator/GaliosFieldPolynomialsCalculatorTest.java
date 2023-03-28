@@ -11,7 +11,7 @@ class GaliosFieldPolynomialsCalculatorTest {
     static int irreduciblePolynomial = 283;
 
     @BeforeAll
-    static void init() throws WrongIrreduciblePolynomialException {
+    static void init() {
         galoisFieldPolynomialsCalculator = new GaloisFieldPolynomialsCalculatorImpl();
     }
 
@@ -47,7 +47,7 @@ class GaliosFieldPolynomialsCalculatorTest {
         byte firstDigitByte = GaloisFieldPolynomialsCalculator.convertIntToByte(firstDigit);
         byte secondDigitByte = GaloisFieldPolynomialsCalculator.convertIntToByte(secondDigit);
 
-        byte multy = galoisFieldPolynomialsCalculator.multi(firstDigitByte, secondDigitByte, irreduciblePolynomial);
+        byte multy = galoisFieldPolynomialsCalculator.multi(firstDigitByte, secondDigitByte);
         int converted = GaloisFieldPolynomialsCalculator.convertByteToInt(multy);
 
         String digit = GaloisFieldPolynomialsCalculator.polynomialToString(converted);
@@ -70,9 +70,9 @@ class GaliosFieldPolynomialsCalculatorTest {
     void checkReverse() {
         for (int i = 1; i < 256; i++) {
             byte digit = GaloisFieldPolynomialsCalculator.convertIntToByte(i);
-            byte reversed = galoisFieldPolynomialsCalculator.getReverse(digit, irreduciblePolynomial);
+            byte reversed = galoisFieldPolynomialsCalculator.getReverse(digit);
 
-            if (galoisFieldPolynomialsCalculator.multi(digit, reversed, irreduciblePolynomial) != 1) {
+            if (galoisFieldPolynomialsCalculator.multi(digit, reversed) != 1) {
                 assert(false);
                 return;
             }
