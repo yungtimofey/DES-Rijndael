@@ -117,7 +117,7 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
             array[i] = inverseSBox[row * S_BOX_SIZE + column];
         }
     }
-    private static byte[] getInverseSBox(int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
+    public static byte[] getInverseSBox(int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
         if (!inverseSBoxAndItsIrreduciblePolynomial.containsKey(irreduciblePolynomial)) {
             inverseSBoxAndItsIrreduciblePolynomial.put(irreduciblePolynomial, generateInverseSBox(irreduciblePolynomial));
         }
@@ -130,7 +130,10 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
         for (int i = 0; i < inverseSBox.length; i++) {
             int row = getRow(sBox[i]);
             int column = getColumn(sBox[i]);
-            inverseSBox[row * S_BOX_SIZE + column] = sBox[i];
+
+            byte iInt = GaloisFieldPolynomialsCalculator.convertIntToByte(i);
+            int toSet = getRow(iInt) * 16 + getColumn(iInt);
+            inverseSBox[row * S_BOX_SIZE + column] = GaloisFieldPolynomialsCalculator.convertIntToByte(toSet);
         }
         return inverseSBox;
     }
