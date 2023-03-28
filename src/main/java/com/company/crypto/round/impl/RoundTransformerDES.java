@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
-public final class RoundTransformerDES extends RoundTransformer {
+public final class RoundTransformerDES implements RoundTransformer {
     private static final int HALF_SIZE = 32;
     private static final int[] E = {
             32, 1, 2, 3, 4, 5,
@@ -135,8 +135,7 @@ public final class RoundTransformerDES extends RoundTransformer {
         return expandedRightHalf;
     }
 
-    @Override
-    protected BitSet sPermutation(BitSet expandedHalf, int currentGroupSize, int newGroupSize) {
+    BitSet sPermutation(BitSet expandedHalf, int currentGroupSize, int newGroupSize) {
         final int columnBits = 2;
         final int rowSize = 1 << (currentGroupSize - columnBits);
 

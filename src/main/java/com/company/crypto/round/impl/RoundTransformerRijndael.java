@@ -4,7 +4,7 @@ import com.company.crypto.round.RoundTransformer;
 
 import java.util.BitSet;
 
-public class RoundTransformerRijndael extends RoundTransformer {
+public class RoundTransformerRijndael implements RoundTransformer {
     public RoundTransformerRijndael() {
 
     }
@@ -19,7 +19,7 @@ public class RoundTransformerRijndael extends RoundTransformer {
         return new byte[0];
     }
 
-    @Override
+
     protected BitSet sPermutation(BitSet expandedHalf, int currentGroupSize, int newGroupSize) {
         return null;
     }

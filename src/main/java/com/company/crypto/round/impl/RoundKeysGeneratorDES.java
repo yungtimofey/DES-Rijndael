@@ -64,7 +64,6 @@ public final class RoundKeysGeneratorDES implements RoundKeysGenerator {
         long digit = bitSet.toLongArray()[0];
 
         final int sizeOfDigit = PC_1_LENGTH / 2;
-        //digit = (digit >> n) | (digit << (sizeOfDigit - n));
         digit = (digit << n) | (digit >> (sizeOfDigit - n));
 
         return BitSet.valueOf(new long[]{digit});

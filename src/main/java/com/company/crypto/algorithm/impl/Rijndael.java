@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
     public enum RijndaelBlockSize {
-        BIT_128(128), BIT_196(196), BIT_256(256);
+        BIT_128(128), BIT_192(192), BIT_256(256);
 
         public final int bitsNumber;
         RijndaelBlockSize(int bitsNumber) {
@@ -19,7 +19,7 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
         }
     }
 
-
+    private static final int S_BOX_SIZE = 16;
     private static final HashMap<Integer, byte[]> sBoxAndItsIrreduciblePolynomial = new HashMap<>();
     private static final GaloisFieldPolynomialsCalculator galoisFieldPolynomialsCalculator = new GaloisFieldPolynomialsCalculatorImpl();
 
@@ -32,9 +32,7 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
         return sBoxAndItsIrreduciblePolynomial.get(irreduciblePolynomial);
     }
     private static byte[] generateSBox(int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
-        final int sBoxSize = 16;
-
-        byte[] sBox = new byte[sBoxSize * sBoxSize];
+        byte[] sBox = new byte[S_BOX_SIZE * S_BOX_SIZE];
         for (int i = 0; i < sBox.length; i++) {
             byte toReverse = GaloisFieldPolynomialsCalculator.convertIntToByte(i);
             byte reversed = galoisFieldPolynomialsCalculator.getReverse(toReverse, irreduciblePolynomial);
@@ -57,17 +55,17 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
     private static byte[][] RCON = null;
     public static byte[][] getRCON(int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
         if (RCON == null) {
-            final int maxNumberOfRounds = 14;
+            final int maxNumberOfRounds = 16;
             byte[] rc = new byte[maxNumberOfRounds];
 
-            rc[0] = 0;
+            rc[0] = 1;
             for (int i = 1; i < rc.length; i++) {
-                rc[i] = galoisFieldPolynomialsCalculator.multi(rc[i-1], (byte) 2, irreduciblePolynomial);
+                rc[i] = galoisFieldPolynomialsCalculator.multi(rc[i-1], (byte)2, irreduciblePolynomial);
             }
 
             RCON = new byte[maxNumberOfRounds][4];
             for (int i = 0; i < rc.length; i++) {
-                RCON[0][i] = rc[i];
+                RCON[i][0] = rc[i];
             }
         }
 
@@ -75,6 +73,37 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
         return RCON;
     }
 
+    public static void subByte(byte[] array, int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
+        byte[] sBox = getSBox(irreduciblePolynomial);
+        for (int i = 0; i < array.length; i++) {
+            int row = getRow(array[i]);
+            int column = getColumn(array[i]);
+            array[i] = sBox[row * S_BOX_SIZE + column];
+        }
+    }
+    private static int getRow(byte digit) {
+        int intDigit = GaloisFieldPolynomialsCalculator.convertByteToInt(digit);
+        String hexDigit = Integer.toHexString(intDigit);
+
+        if (hexDigit.length() == 1) {
+            return 0;
+        }
+
+        char c = Integer.toHexString(intDigit).charAt(0);
+        return Character.isDigit(c) ? c - '0' : c - 'a' + 10;
+    }
+    private static int getColumn(byte digit) {
+        int intDigit = GaloisFieldPolynomialsCalculator.convertByteToInt(digit);
+        String hexDigit = Integer.toHexString(intDigit);
+
+        char c;
+        if (hexDigit.length() == 1) {
+            c = Integer.toHexString(intDigit).charAt(0);
+        } else {
+            c = Integer.toHexString(intDigit).charAt(1);
+        }
+        return Character.isDigit(c) ? c - '0' : c - 'a' + 10;
+    }
 
     private final RoundKeysGenerator roundKeysGenerator;
     private final RoundTransformer roundTransformer;
