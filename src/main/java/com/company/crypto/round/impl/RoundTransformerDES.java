@@ -76,13 +76,13 @@ public final class RoundTransformerDES implements RoundTransformer {
     };
 
     @Override
-    public byte[] encode(byte[] inputBlock, byte[] roundKey, boolean isLastRound) {
-        return doRound(inputBlock, roundKey, isLastRound);
+    public byte[] encode(byte[] inputBlock, byte[] roundKey, boolean predicate) {
+        return doRound(inputBlock, roundKey, predicate);
     }
 
     @Override
-    public byte[] decode(byte[] inputBlock, byte[] roundKey, boolean isLastRound) {
-        return doRound(inputBlock, roundKey, isLastRound);
+    public byte[] decode(byte[] inputBlock, byte[] roundKey, boolean predicate) {
+        return doRound(inputBlock, roundKey, predicate);
     }
 
     byte[] doRound(byte[] inputBlock, byte[] roundKey, boolean isLastRound) {

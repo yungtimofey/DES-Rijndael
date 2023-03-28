@@ -8,8 +8,11 @@ import com.company.polynomial.calculator.GaloisFieldPolynomialsCalculatorImpl;
 import com.company.polynomial.exception.WrongIrreduciblePolynomialException;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
+    private static int cipherKeyBitsNumber;
+
     public enum RijndaelBlockSize {
         BIT_128(128), BIT_192(192), BIT_256(256);
 
@@ -21,6 +24,7 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
 
     private static final int S_BOX_SIZE = 16;
     private static final HashMap<Integer, byte[]> sBoxAndItsIrreduciblePolynomial = new HashMap<>();
+    private static final HashMap<Integer, byte[]> inverseSBoxAndItsIrreduciblePolynomial = new HashMap<>();
     private static final GaloisFieldPolynomialsCalculator galoisFieldPolynomialsCalculator = new GaloisFieldPolynomialsCalculatorImpl();
 
     public static byte[] getSBox(int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
@@ -105,27 +109,89 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
         return Character.isDigit(c) ? c - '0' : c - 'a' + 10;
     }
 
+    public static void inverseSubByte(byte[] array, int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
+        byte[] inverseSBox = getInverseSBox(irreduciblePolynomial);
+        for (int i = 0; i < array.length; i++) {
+            int row = getRow(array[i]);
+            int column = getColumn(array[i]);
+            array[i] = inverseSBox[row * S_BOX_SIZE + column];
+        }
+    }
+    private static byte[] getInverseSBox(int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
+        if (!inverseSBoxAndItsIrreduciblePolynomial.containsKey(irreduciblePolynomial)) {
+            inverseSBoxAndItsIrreduciblePolynomial.put(irreduciblePolynomial, generateInverseSBox(irreduciblePolynomial));
+        }
+        return inverseSBoxAndItsIrreduciblePolynomial.get(irreduciblePolynomial);
+    }
+    private static byte[] generateInverseSBox(int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
+        byte[] inverseSBox = new byte[S_BOX_SIZE * S_BOX_SIZE];
+        byte[] sBox = getSBox(irreduciblePolynomial);
+
+        for (int i = 0; i < inverseSBox.length; i++) {
+            int row = getRow(sBox[i]);
+            int column = getColumn(sBox[i]);
+            inverseSBox[row * S_BOX_SIZE + column] = sBox[i];
+        }
+        return inverseSBox;
+    }
+
+
+    public static int getRoundNumber(Rijndael.RijndaelBlockSize openTextSize, Rijndael.RijndaelBlockSize cipherKeySize) {
+        int openTextBitsNumber = openTextSize.bitsNumber;
+        int cipherKeyBitsNumber = cipherKeySize.bitsNumber;
+
+        if (openTextBitsNumber == 256 || cipherKeyBitsNumber == 256) {
+            return 14;
+        }
+        if (openTextBitsNumber == 128 && cipherKeyBitsNumber == 128) {
+            return 10;
+        }
+        return 12;
+    }
+
     private final RoundKeysGenerator roundKeysGenerator;
     private final RoundTransformer roundTransformer;
     private final int irreduciblePolynomial;
+    private final int roundNumber;
     private byte[] cipherKey;
 
    // TODO: made static method for init polynomial
 
-    public Rijndael(RoundKeysGenerator roundKeysGenerator, RoundTransformer roundTransformer) {
+    public Rijndael(
+            RoundKeysGenerator roundKeysGenerator,
+            RoundTransformer roundTransformer,
+            Rijndael.RijndaelBlockSize openTextSize,
+            Rijndael.RijndaelBlockSize cipherKeySize,
+            int irreduciblePolynomial
+    ) {
         this.roundKeysGenerator = roundKeysGenerator;
         this.roundTransformer = roundTransformer;
-        this.irreduciblePolynomial = 283;
+        this.irreduciblePolynomial = irreduciblePolynomial;
+        this.roundNumber = Rijndael.getRoundNumber(openTextSize, cipherKeySize);
     }
 
     @Override
     public byte[] decode(byte[] inputBlock) {
-        return new byte[0];
+        Objects.requireNonNull(inputBlock);
+        Objects.requireNonNull(cipherKey);
+
+        byte[][] roundKeys = roundKeysGenerator.generate(cipherKey);
+        for (int i = 0;  i < roundNumber; i++) {
+            inputBlock = roundTransformer.encode(inputBlock, roundKeys[i], i == roundNumber-1);
+        }
+        return inputBlock;
     }
 
     @Override
     public byte[] encode(byte[] inputBlock) {
-        return new byte[0];
+        Objects.requireNonNull(inputBlock);
+        Objects.requireNonNull(cipherKey);
+
+        byte[][] roundKeys = roundKeysGenerator.generate(cipherKey);
+        for (int i = 0;  i < roundNumber; i++) {
+            inputBlock = roundTransformer.decode(inputBlock, roundKeys[i], i == roundNumber-1);
+        }
+        return inputBlock;
     }
 
     @Override

@@ -13,7 +13,8 @@ public interface GaloisFieldPolynomialsCalculator {
         int y;
     }
 
-    byte sum(byte firstPolynomial, byte secondPolynomial);
+
+    byte sum(byte... polynomials);
 
     byte minus(byte firstPolynomial, byte secondPolynomial);
 

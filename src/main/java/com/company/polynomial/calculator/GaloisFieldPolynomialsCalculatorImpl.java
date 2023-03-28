@@ -43,7 +43,7 @@ public final class GaloisFieldPolynomialsCalculatorImpl implements GaloisFieldPo
 
             degreeOfFirstPolynomial = getDegree(firstPolynomial);
         }
-        return (byte) firstPolynomial;
+        return GaloisFieldPolynomialsCalculator.convertIntToByte(firstPolynomial);
     }
 
     static int getDegree(int polynomial) {
@@ -71,8 +71,13 @@ public final class GaloisFieldPolynomialsCalculatorImpl implements GaloisFieldPo
     }
 
     @Override
-    public byte sum(byte firstPolynomial, byte secondPolynomial) {
-        return (byte) (firstPolynomial ^ secondPolynomial);
+    public byte sum(byte... polynomials) {
+        int answer = 0;
+        for (byte polynomial : polynomials) {
+            int intPolynomial = GaloisFieldPolynomialsCalculator.convertByteToInt(polynomial);
+            answer ^= intPolynomial;
+        }
+        return GaloisFieldPolynomialsCalculator.convertIntToByte(answer);
     }
 
     @Override
@@ -99,7 +104,6 @@ public final class GaloisFieldPolynomialsCalculatorImpl implements GaloisFieldPo
         }
         return result;
     }
-
 
     @Override
     public byte getReverse(byte polynomial, int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {

@@ -24,21 +24,10 @@ public final class RoundKeyGeneratorRijndael implements RoundKeysGenerator {
 
         this.openTextColumnNumber = openTextSize.bitsNumber / (ROW_NUMBER * Byte.SIZE);
         this.keyColumnNumber = cipherKeySize.bitsNumber / (ROW_NUMBER * Byte.SIZE);
-        this.roundNumber = getRoundNumber(openTextSize.bitsNumber, cipherKeySize.bitsNumber);
-
+        this.roundNumber = Rijndael.getRoundNumber(openTextSize, cipherKeySize);
         this.W = new byte[openTextColumnNumber * (roundNumber + 1)][ROW_NUMBER];
 
         this.irreduciblePolynomial = irreduciblePolynomial;
-    }
-
-    private int getRoundNumber(int openTextBitsNumber, int cipherKeyBitsNumber) {
-        if (openTextBitsNumber == 256 || cipherKeyBitsNumber == 256) {
-            return 14;
-        }
-        if (openTextBitsNumber == 128 && cipherKeyBitsNumber == 128) {
-            return 10;
-        }
-        return 12;
     }
 
     @Override
