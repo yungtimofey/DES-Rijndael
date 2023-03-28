@@ -17,13 +17,12 @@ public interface GaloisFieldPolynomialsCalculator {
 
     byte minus(byte firstPolynomial, byte secondPolynomial);
 
-    byte multi(byte firstPolynomial, byte secondPolynomial);
+    byte multi(byte firstPolynomial, byte secondPolynomial, int irreduciblePolynomial) throws WrongIrreduciblePolynomialException;
 
     List<Integer> getAllIrreduciblePolynomials();
 
-    byte getReverse(byte polynomial);
+    byte getReverse(byte polynomial, int irreduciblePolynomial) throws WrongIrreduciblePolynomialException;
 
-    void setIrreduciblePolynomial(int irreduciblePolynomial) throws WrongIrreduciblePolynomialException;
 
     static byte convertIntToByte(int polynomial) {
         byte converted = 0;

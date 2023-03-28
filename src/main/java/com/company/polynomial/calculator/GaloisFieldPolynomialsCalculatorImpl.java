@@ -58,8 +58,6 @@ public final class GaloisFieldPolynomialsCalculatorImpl implements GaloisFieldPo
     }
 
     private final Set<Integer> allIrreduciblePolynomials = new HashSet<>();
-    private int irreduciblePolynomial = 283;
-
     public GaloisFieldPolynomialsCalculatorImpl() {
         initIrreduciblePolynomialsSet();
     }
@@ -72,21 +70,22 @@ public final class GaloisFieldPolynomialsCalculatorImpl implements GaloisFieldPo
                 .forEach(allIrreduciblePolynomials::add);
     }
 
-
     @Override
     public byte sum(byte firstPolynomial, byte secondPolynomial) {
         return (byte) (firstPolynomial ^ secondPolynomial);
     }
-
 
     @Override
     public byte minus(byte firstPolynomial, byte secondPolynomial) {
         return (byte) (firstPolynomial ^ secondPolynomial);
     }
 
-
     @Override
-    public byte multi(byte firstPolynomial, byte secondPolynomial) {
+    public byte multi(byte firstPolynomial, byte secondPolynomial, int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
+        if (!polynomialIsIrreducible(irreduciblePolynomial)) {
+            throw new WrongIrreduciblePolynomialException();
+        }
+
         int firstPolynomialInt = GaloisFieldPolynomialsCalculator.convertByteToInt(firstPolynomial);
         int secondPolynomialInt = GaloisFieldPolynomialsCalculator.convertByteToInt(secondPolynomial);
 
@@ -103,7 +102,11 @@ public final class GaloisFieldPolynomialsCalculatorImpl implements GaloisFieldPo
 
 
     @Override
-    public byte getReverse(byte polynomial) {
+    public byte getReverse(byte polynomial, int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
+        if (!polynomialIsIrreducible(irreduciblePolynomial)) {
+            throw new WrongIrreduciblePolynomialException();
+        }
+
         if (polynomial == 0) {
             return 0;
         }
@@ -112,14 +115,6 @@ public final class GaloisFieldPolynomialsCalculatorImpl implements GaloisFieldPo
 
         EEATuple eea = EEA(irreduciblePolynomial, polynomialInt);
         return GaloisFieldPolynomialsCalculator.convertIntToByte(eea.y);
-    }
-
-    @Override
-    public void setIrreduciblePolynomial(int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
-        if (polynomialIsIrreducible(irreduciblePolynomial)) {
-            throw new WrongIrreduciblePolynomialException();
-        }
-        this.irreduciblePolynomial = irreduciblePolynomial;
     }
 
     EEATuple EEA(int a, int b) {

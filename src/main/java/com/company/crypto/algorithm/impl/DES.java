@@ -5,7 +5,7 @@ import com.company.crypto.round.RoundTransformer;
 
 import java.util.BitSet;
 
-public class DES extends FeistelNetwork {
+public final class DES extends FeistelNetwork {
     private static final int OPEN_TEXT_SIZE = 64;
     private static final int SIZE_OF_OPEN_TEXT_BYTE_ARRAY = OPEN_TEXT_SIZE / Byte.SIZE;
     private static final int[] IP = {
