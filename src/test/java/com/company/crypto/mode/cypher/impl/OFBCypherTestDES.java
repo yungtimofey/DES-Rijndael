@@ -16,7 +16,7 @@ import java.nio.file.Path;
 import java.util.BitSet;
 
 
-class RDPlusHCypherTest {
+class OFBCypherTestDES {
     static Cypher cypher;
     static byte[] key;
     static byte[] IV;
@@ -30,9 +30,9 @@ class RDPlusHCypherTest {
 
         cypher = Cypher.build(
                 key,
-                SymmetricalBlockMode.RD,
+                SymmetricalBlockMode.OFB,
                 new DES(new RoundKeysGeneratorDES(), new RoundTransformerDES()),
-                IV, 0, IV
+                IV
         );
     }
 
@@ -99,6 +99,7 @@ class RDPlusHCypherTest {
 
         assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
     }
+
 
     private static BitSet init(int size, int ... indexes) {
         BitSet bitSet = new BitSet(size);

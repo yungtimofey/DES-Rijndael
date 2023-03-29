@@ -15,8 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.BitSet;
 
-
-class RDCypherTest {
+class CFBCypherTestDES {
     static Cypher cypher;
     static byte[] key;
     static byte[] IV;
@@ -30,7 +29,7 @@ class RDCypherTest {
 
         cypher = Cypher.build(
                 key,
-                SymmetricalBlockMode.RD,
+                SymmetricalBlockMode.CFB,
                 new DES(new RoundKeysGeneratorDES(), new RoundTransformerDES()),
                 IV
         );
@@ -38,9 +37,9 @@ class RDCypherTest {
 
     @Test
     void encodeAndDecodeTextFile() throws IOException {
-        String input = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\1.txt";
-        String encoded = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.txt";
-        String decoded = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.txt";
+        String input = "1.txt";
+        String encoded = "2.txt";
+        String decoded = "3.txt";
 
         File inputFile = new File(input);
         File encodedFile = new File(encoded);
@@ -54,9 +53,9 @@ class RDCypherTest {
 
     @Test
     void encodeAndDecodeImage() throws IOException {
-        String input = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\1.jpg";
-        String encoded = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.jpg";
-        String decoded = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.jpg";
+        String input = "1.jpg";
+        String encoded = "2.jpg";
+        String decoded = "3.jpg";
 
         File inputFile = new File(input);
         File encodedFile = new File(encoded);
@@ -70,9 +69,9 @@ class RDCypherTest {
 
     @Test
     void encodeAndDecodeVideo() throws IOException {
-        String input = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\Patrick.mp4";
-        String encoded = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.mp4";
-        String decoded = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.mp4";
+        String input = "Patrick.mp4";
+        String encoded = "2.mp4";
+        String decoded = "3.mp4";
 
         File inputFile = new File(input);
         File encodedFile = new File(encoded);
@@ -86,9 +85,9 @@ class RDCypherTest {
 
     @Test
     void encodeAndDecodeLongVideo() throws IOException {
-        String input = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\Song.mp4";
-        String encoded = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.mp4";
-        String decoded = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.mp4";
+        String input = "song.mp4";
+        String encoded = "2.mp4";
+        String decoded = "3.mp4";
 
         File inputFile = new File(input);
         File encodedFile = new File(encoded);
@@ -100,7 +99,6 @@ class RDCypherTest {
         assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
     }
 
-
     private static BitSet init(int size, int ... indexes) {
         BitSet bitSet = new BitSet(size);
         for (int i = 0; i < size; i++) {
@@ -111,7 +109,6 @@ class RDCypherTest {
         }
         return bitSet;
     }
-
 
     @AfterAll
     static void finish() {

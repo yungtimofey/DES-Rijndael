@@ -15,23 +15,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.BitSet;
 
-class CFBCypherTest {
+
+class ECBCypherTestDES {
     static Cypher cypher;
     static byte[] key;
-    static byte[] IV;
 
     @BeforeAll
     static void init() {
         BitSet bitSet = init(64, 1, 2, 3, 4, 32, 34, 37, 41, 42, 54, 56, 57, 58);
         key = bitSet.toByteArray();
 
-        IV = init(64, 1, 2, 3, 4, 32, 34, 37, 41, 42, 54, 56, 57, 58, 62).toByteArray();
-
         cypher = Cypher.build(
                 key,
-                SymmetricalBlockMode.CFB,
-                new DES(new RoundKeysGeneratorDES(), new RoundTransformerDES()),
-                IV
+                SymmetricalBlockMode.ECB,
+                new DES(new RoundKeysGeneratorDES(), new RoundTransformerDES())
         );
     }
 
@@ -99,6 +96,22 @@ class CFBCypherTest {
         assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
     }
 
+    @Test
+    void encodeAndDecodeSong() throws IOException {
+        String input = "kenny.mp3";
+        String encoded = "2.mp3";
+        String decoded = "3.mp3";
+
+        File inputFile = new File(input);
+        File encodedFile = new File(encoded);
+        File decodedFile = new File(decoded);
+
+        cypher.encode(inputFile, encodedFile);
+        cypher.decode(encodedFile, decodedFile);
+
+        assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
+    }
+
     private static BitSet init(int size, int ... indexes) {
         BitSet bitSet = new BitSet(size);
         for (int i = 0; i < size; i++) {
@@ -109,6 +122,7 @@ class CFBCypherTest {
         }
         return bitSet;
     }
+
 
     @AfterAll
     static void finish() {

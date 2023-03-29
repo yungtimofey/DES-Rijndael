@@ -16,19 +16,23 @@ import java.nio.file.Path;
 import java.util.BitSet;
 
 
-class ECBCypherTest {
+class RDPlusHCypherTestDES {
     static Cypher cypher;
     static byte[] key;
+    static byte[] IV;
 
     @BeforeAll
     static void init() {
         BitSet bitSet = init(64, 1, 2, 3, 4, 32, 34, 37, 41, 42, 54, 56, 57, 58);
         key = bitSet.toByteArray();
 
+        IV = init(64, 1, 2, 3, 4, 32, 34, 37, 41, 42, 54, 56, 57, 58, 62).toByteArray();
+
         cypher = Cypher.build(
                 key,
-                SymmetricalBlockMode.ECB,
-                new DES(new RoundKeysGeneratorDES(), new RoundTransformerDES())
+                SymmetricalBlockMode.RD,
+                new DES(new RoundKeysGeneratorDES(), new RoundTransformerDES()),
+                IV, 0, IV
         );
     }
 
@@ -85,22 +89,6 @@ class ECBCypherTest {
         String input = "song.mp4";
         String encoded = "2.mp4";
         String decoded = "3.mp4";
-
-        File inputFile = new File(input);
-        File encodedFile = new File(encoded);
-        File decodedFile = new File(decoded);
-
-        cypher.encode(inputFile, encodedFile);
-        cypher.decode(encodedFile, decodedFile);
-
-        assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
-    }
-
-    @Test
-    void encodeAndDecodeSong() throws IOException {
-        String input = "kenny.mp3";
-        String encoded = "2.mp3";
-        String decoded = "3.mp3";
 
         File inputFile = new File(input);
         File encodedFile = new File(encoded);

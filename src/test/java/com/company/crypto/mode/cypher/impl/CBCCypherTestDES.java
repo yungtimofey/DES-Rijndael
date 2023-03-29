@@ -15,20 +15,24 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.BitSet;
 
-class CTRCypherTest {
+
+class CBCCypherTestDES {
     static Cypher cypher;
     static byte[] key;
+    static byte[] IV;
 
     @BeforeAll
     static void init() {
         BitSet bitSet = init(64, 1, 2, 3, 4, 32, 34, 37, 41, 42, 54, 56, 57, 58);
         key = bitSet.toByteArray();
 
+        IV = init(64, 1, 2, 3, 4, 32, 34, 37, 41, 42, 54, 56, 57, 58, 62).toByteArray();
+
         cypher = Cypher.build(
                 key,
-                SymmetricalBlockMode.CTR,
+                SymmetricalBlockMode.CBC,
                 new DES(new RoundKeysGeneratorDES(), new RoundTransformerDES()),
-                null, 2
+                IV
         );
     }
 
@@ -114,4 +118,5 @@ class CTRCypherTest {
             cypher.close();
         }
     }
+
 }

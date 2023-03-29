@@ -15,24 +15,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.BitSet;
 
-
-class OFBCypherTest {
+class CTRCypherTestDES {
     static Cypher cypher;
     static byte[] key;
-    static byte[] IV;
 
     @BeforeAll
     static void init() {
         BitSet bitSet = init(64, 1, 2, 3, 4, 32, 34, 37, 41, 42, 54, 56, 57, 58);
         key = bitSet.toByteArray();
 
-        IV = init(64, 1, 2, 3, 4, 32, 34, 37, 41, 42, 54, 56, 57, 58, 62).toByteArray();
-
         cypher = Cypher.build(
                 key,
-                SymmetricalBlockMode.OFB,
+                SymmetricalBlockMode.CTR,
                 new DES(new RoundKeysGeneratorDES(), new RoundTransformerDES()),
-                IV
+                null, 2
         );
     }
 
@@ -99,7 +95,6 @@ class OFBCypherTest {
 
         assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
     }
-
 
     private static BitSet init(int size, int ... indexes) {
         BitSet bitSet = new BitSet(size);
