@@ -34,7 +34,7 @@ public class RoundTransformerRijndael implements RoundTransformer {
     @Override
     public byte[] encode(byte[] inputBlock, byte[] roundKey, boolean predicate) {
         try {
-            return tryToEncode(Arrays.copyOf(inputBlock, inputBlock.length), roundKey, predicate);
+            return tryToEncode(inputBlock, roundKey, predicate);
         } catch (WrongIrreduciblePolynomialException e) {
             throw new IllegalStateException("Wrong Polynomial:" + irreduciblePolynomial);
         }
@@ -145,7 +145,7 @@ public class RoundTransformerRijndael implements RoundTransformer {
     @Override
     public byte[] decode(byte[] inputBlock, byte[] roundKey, boolean isFirstRound) {
         try {
-            return tryToDecode(Arrays.copyOf(inputBlock, inputBlock.length), roundKey, isFirstRound);
+            return tryToDecode(inputBlock, roundKey, isFirstRound);
         } catch (WrongIrreduciblePolynomialException e) {
             throw new IllegalStateException("Wrong Polynomial:" + irreduciblePolynomial);
         }

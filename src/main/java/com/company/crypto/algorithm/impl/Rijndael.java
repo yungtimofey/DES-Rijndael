@@ -7,6 +7,7 @@ import com.company.polynomial.calculator.GaloisFieldPolynomialsCalculator;
 import com.company.polynomial.calculator.GaloisFieldPolynomialsCalculatorImpl;
 import com.company.polynomial.exception.WrongIrreduciblePolynomialException;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -176,7 +177,7 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
 
         byte[][] roundKeys = roundKeysGenerator.generate(cipherKey);
         for (int i = 0;  i < roundNumber; i++) {
-            inputBlock = roundTransformer.encode(inputBlock, roundKeys[i], i == roundNumber-1);
+            inputBlock = roundTransformer.encode(Arrays.copyOf(inputBlock, inputBlock.length), roundKeys[i], i == roundNumber-1);
         }
         return inputBlock;
     }
@@ -188,7 +189,7 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
 
         byte[][] roundKeys = roundKeysGenerator.generate(cipherKey);
         for (int i = 0;  i < roundNumber; i++) {
-            inputBlock = roundTransformer.decode(inputBlock, roundKeys[i], i == roundNumber-1);
+            inputBlock = roundTransformer.decode(Arrays.copyOf(inputBlock, inputBlock.length), roundKeys[i], i == roundNumber-1);
         }
         return inputBlock;
     }
