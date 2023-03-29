@@ -8,4 +8,5 @@ public interface SymmetricalBlockEncryptionAlgorithm {
     byte[] decode(byte[] inputBlock);
     byte[] encode(byte[] inputBlock);
     void setKey(byte[] cipherKey);
+    int getOpenTextBlockSizeInBytes();
 }

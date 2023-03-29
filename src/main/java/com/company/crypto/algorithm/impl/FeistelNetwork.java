@@ -48,4 +48,9 @@ class FeistelNetwork implements SymmetricalBlockEncryptionAlgorithm {
     public void setKey(byte[] cipherKey) {
         this.cipherKey64Bit = cipherKey;
     }
+
+    @Override
+    public int getOpenTextBlockSizeInBytes() {
+        return 8;
+    }
 }

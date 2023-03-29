@@ -15,7 +15,6 @@ public class RDPlusHCypher extends SymmetricalBlockModeCypher {
     private final long startDigit;
     private final int delta;
     private final byte[] hash;
-    private final byte[] buffer = new byte[BUFFER_SIZE];
 
     public RDPlusHCypher(SymmetricalBlockEncryptionAlgorithm algorithm, byte[] initialVector, byte[] hash) {
         super(algorithm, Runtime.getRuntime().availableProcessors()-1);
@@ -35,7 +34,7 @@ public class RDPlusHCypher extends SymmetricalBlockModeCypher {
     @Override
     public void encode(File inputFile, File outputFile) throws IOException {
         long fileLengthInByte = inputFile.length();
-        long blockNumber = fileLengthInByte / BUFFER_SIZE;
+        long blockNumber = fileLengthInByte / bufferSize;
 
         List<Callable<Void>> callableList = new ArrayList<>();
         if (blockNumber < threadNumber || threadNumber < 2) {
@@ -45,7 +44,7 @@ public class RDPlusHCypher extends SymmetricalBlockModeCypher {
                     .indexToStart(this.startDigit)
                     .delta(delta)
                     .hash(hash)
-                    .bufferSize(BUFFER_SIZE)
+                    .bufferSize(bufferSize)
                     .algorithm(algorithm)
                     .inputFile(new RandomAccessFile(inputFile, "r"))
                     .outputFile(new RandomAccessFile(outputFile, "rw"))
@@ -56,27 +55,27 @@ public class RDPlusHCypher extends SymmetricalBlockModeCypher {
             for (int i = 0; i < threadNumber - 1; i++) {
                 Callable<Void> encodeCallable = RDPlusHEncode.builder()
                         .filePositionToStart(endOfPreviousBlock)
-                        .byteToEncode(blockNumber / threadNumber * BUFFER_SIZE)
-                        .indexToStart(endOfPreviousBlock / BUFFER_SIZE * delta + startDigit)
+                        .byteToEncode(blockNumber / threadNumber * bufferSize)
+                        .indexToStart(endOfPreviousBlock / bufferSize * delta + startDigit)
                         .delta(delta)
                         .hash(hash)
-                        .bufferSize(BUFFER_SIZE)
+                        .bufferSize(bufferSize)
                         .algorithm(algorithm)
                         .inputFile(new RandomAccessFile(inputFile, "r"))
                         .outputFile(new RandomAccessFile(outputFile, "rw"))
                         .build();
                 callableList.add(encodeCallable);
 
-                endOfPreviousBlock += blockNumber / threadNumber * BUFFER_SIZE;
+                endOfPreviousBlock += blockNumber / threadNumber * bufferSize;
             }
 
             Callable<Void> encodeCallable = RDPlusHEncode.builder()
                     .filePositionToStart(endOfPreviousBlock)
                     .byteToEncode(fileLengthInByte - endOfPreviousBlock)
-                    .indexToStart(endOfPreviousBlock / BUFFER_SIZE * delta + startDigit)
+                    .indexToStart(endOfPreviousBlock / bufferSize * delta + startDigit)
                     .hash(hash)
                     .delta(delta)
-                    .bufferSize(BUFFER_SIZE)
+                    .bufferSize(bufferSize)
                     .algorithm(algorithm)
                     .inputFile(new RandomAccessFile(inputFile, "r"))
                     .outputFile(new RandomAccessFile(outputFile, "rw"))
@@ -97,16 +96,16 @@ public class RDPlusHCypher extends SymmetricalBlockModeCypher {
             boolean isFirstDecode = true;
             byte[] encoded = null;
 
-            byte[] previousOpenBlock = new byte[BUFFER_SIZE];
-            System.arraycopy(hash, 0, previousOpenBlock, 0, BUFFER_SIZE);
+            byte[] previousOpenBlock = new byte[bufferSize];
+            System.arraycopy(hash, 0, previousOpenBlock, 0, bufferSize);
 
-            byte[] presentedDigit = new byte[BUFFER_SIZE];
-            while (inputStream.read(buffer, 0, BUFFER_SIZE) != -1) {
+            byte[] presentedDigit = new byte[bufferSize];
+            while (inputStream.read(buffer, 0, bufferSize) != -1) {
                 if (isFirstDecode) {
                     isFirstDecode = false;
                 } else {
                     outputStream.write(encoded);
-                    System.arraycopy(encoded, 0, previousOpenBlock, 0, BUFFER_SIZE);
+                    System.arraycopy(encoded, 0, previousOpenBlock, 0, bufferSize);
 
                     i += delta;
                 }

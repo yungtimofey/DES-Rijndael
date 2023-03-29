@@ -9,10 +9,6 @@ import java.util.concurrent.Callable;
 
 @Builder
 public class CBCDecodeFile implements Callable<Void> {
-    private static final int BUFFER_SIZE = 8;
-
-    private final byte[] buffer = new byte[BUFFER_SIZE];
-
     private final long filePositionToStart;
     private final long byteToEncode;
     private final int bufferSize;
@@ -21,8 +17,12 @@ public class CBCDecodeFile implements Callable<Void> {
     private final SymmetricalBlockEncryptionAlgorithm algorithm;
     private final byte[] initialVector;
 
+    private byte[] buffer;
+
     @Override
     public Void call() throws IOException {
+        buffer = new byte[bufferSize];
+
         inputFile.seek(filePositionToStart);
         outputFile.seek(filePositionToStart);
 
@@ -34,12 +34,12 @@ public class CBCDecodeFile implements Callable<Void> {
             byte[] decoded = null;
 
             byte[] toXor;
-            byte[] previousBuffer = new byte[BUFFER_SIZE];
-            System.arraycopy(getInitialVector(inputStream), 0, previousBuffer, 0, BUFFER_SIZE);
+            byte[] previousBuffer = new byte[bufferSize];
+            System.arraycopy(getInitialVector(inputStream), 0, previousBuffer, 0, bufferSize);
 
             long read;
             long allReadBytes = 0;
-            while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1 && allReadBytes <= byteToEncode) {
+            while ((read = inputStream.read(buffer, 0, bufferSize)) != -1 && allReadBytes <= byteToEncode) {
                 if (isFirstDecode) {
                     isFirstDecode = false;
                 } else {
@@ -67,8 +67,8 @@ public class CBCDecodeFile implements Callable<Void> {
             return initialVector;
         }
 
-        inputFile.seek(inputFile.getFilePointer() - BUFFER_SIZE);
-        if (inputStream.read(buffer, 0, BUFFER_SIZE) != BUFFER_SIZE) {
+        inputFile.seek(inputFile.getFilePointer() - bufferSize);
+        if (inputStream.read(buffer, 0, bufferSize) != bufferSize) {
             throw new IllegalArgumentException("Wrong file position!");
         }
         return buffer;

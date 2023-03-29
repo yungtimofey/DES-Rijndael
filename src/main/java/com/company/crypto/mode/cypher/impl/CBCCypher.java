@@ -13,7 +13,6 @@ import java.util.concurrent.*;
 
 
 public class CBCCypher extends SymmetricalBlockModeCypher {
-    private final byte[] buffer = new byte[BUFFER_SIZE];
     private final byte[] initialVector;
 
     public CBCCypher(SymmetricalBlockEncryptionAlgorithm algorithm, byte[] initialVector) {
@@ -30,9 +29,9 @@ public class CBCCypher extends SymmetricalBlockModeCypher {
             byte[] toXor = initialVector;
             long read;
 
-            while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1) {
-                if (read < BUFFER_SIZE) {
-                    PKCS7.doPadding(buffer, (int) (BUFFER_SIZE - read));
+            while ((read = inputStream.read(buffer, 0, bufferSize)) != -1) {
+                if (read < bufferSize) {
+                    PKCS7.doPadding(buffer, (int) (bufferSize - read));
                 }
 
                 xor(buffer, toXor);
@@ -48,14 +47,14 @@ public class CBCCypher extends SymmetricalBlockModeCypher {
     @Override
     public void decode(File inputFile, File outputFile) throws IOException {
         long fileLengthInByte = inputFile.length();
-        long blockNumber = fileLengthInByte / BUFFER_SIZE;
+        long blockNumber = fileLengthInByte / bufferSize;
 
         List<Callable<Void>> callableList = new ArrayList<>();
         if (blockNumber < threadNumber || threadNumber < 2) {
             Callable<Void> decodeCallable = CBCDecodeFile.builder()
                     .filePositionToStart(0)
                     .byteToEncode(fileLengthInByte)
-                    .bufferSize(BUFFER_SIZE)
+                    .bufferSize(bufferSize)
                     .initialVector(initialVector)
                     .algorithm(algorithm)
                     .inputFile(new RandomAccessFile(inputFile, "r"))
@@ -67,8 +66,8 @@ public class CBCCypher extends SymmetricalBlockModeCypher {
             for (int i = 0; i < threadNumber-1; i++) {
                 Callable<Void> decodeCallable = CBCDecodeFile.builder()
                         .filePositionToStart(endOfPreviousBlock)
-                        .byteToEncode(blockNumber / threadNumber * BUFFER_SIZE)
-                        .bufferSize(BUFFER_SIZE)
+                        .byteToEncode(blockNumber / threadNumber * bufferSize)
+                        .bufferSize(bufferSize)
                         .initialVector(initialVector)
                         .algorithm(algorithm)
                         .inputFile(new RandomAccessFile(inputFile, "r"))
@@ -76,13 +75,13 @@ public class CBCCypher extends SymmetricalBlockModeCypher {
                         .build();
                 callableList.add(decodeCallable);
 
-                endOfPreviousBlock += blockNumber/threadNumber * BUFFER_SIZE;
+                endOfPreviousBlock += blockNumber/threadNumber * bufferSize;
             }
 
             Callable<Void> decodeCallable = CBCDecodeFile.builder()
                     .filePositionToStart(endOfPreviousBlock)
                     .byteToEncode(fileLengthInByte - endOfPreviousBlock)
-                    .bufferSize(BUFFER_SIZE)
+                    .bufferSize(bufferSize)
                     .initialVector(initialVector)
                     .algorithm(algorithm)
                     .inputFile(new RandomAccessFile(inputFile, "r"))

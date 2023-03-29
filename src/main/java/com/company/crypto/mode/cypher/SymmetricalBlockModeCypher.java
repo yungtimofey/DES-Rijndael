@@ -14,17 +14,20 @@ import java.util.concurrent.*;
  * Its class is used by Cypher. Makes encode and decode
  */
 public abstract class SymmetricalBlockModeCypher implements Closeable {
-    protected static final int BUFFER_SIZE = 8;
-
     protected final int threadNumber;
     protected final ExecutorService executorService;
     protected final SymmetricalBlockEncryptionAlgorithm algorithm;
+    protected final int bufferSize;
+    protected final byte[] buffer;
 
     protected SymmetricalBlockModeCypher(SymmetricalBlockEncryptionAlgorithm algorithm, int threadNumber) {
         this.algorithm = algorithm;
         this.threadNumber = threadNumber;
 
         this.executorService = (threadNumber > 0) ? Executors.newScheduledThreadPool(threadNumber) : null;
+
+        this.bufferSize = algorithm.getOpenTextBlockSizeInBytes();
+        this.buffer = new byte[bufferSize];
     }
 
     public abstract void encode(File inputFile, File outputFile) throws IOException;

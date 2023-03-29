@@ -10,9 +10,7 @@ import java.util.concurrent.Callable;
 
 @Builder
 public class CTREncodeFile implements Callable<Void> {
-    private static final int BUFFER_SIZE = 8;
-
-    private final byte[] buffer = new byte[BUFFER_SIZE];
+    private byte[] buffer;
 
     private final long filePositionToStart;
     private final long byteToEncode;
@@ -25,6 +23,8 @@ public class CTREncodeFile implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
+        buffer = new byte[bufferSize];
+
         inputFile.seek(filePositionToStart);
         outputFile.seek(filePositionToStart);
 
@@ -36,10 +36,10 @@ public class CTREncodeFile implements Callable<Void> {
             long allReadBytes = 0;
             long read;
 
-            byte[] presentedDigit = new byte[BUFFER_SIZE];
-            while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1 && allReadBytes <= byteToEncode) {
-                if (read < BUFFER_SIZE) {
-                    PKCS7.doPadding(buffer, (int) (BUFFER_SIZE - read));
+            byte[] presentedDigit = new byte[bufferSize];
+            while ((read = inputStream.read(buffer, 0, bufferSize)) != -1 && allReadBytes <= byteToEncode) {
+                if (read < bufferSize) {
+                    PKCS7.doPadding(buffer, (int) (bufferSize - read));
                 }
 
                 presentLongAsByteArray(presentedDigit, i);
@@ -55,7 +55,7 @@ public class CTREncodeFile implements Callable<Void> {
         return null;
     }
     private void xor(byte[] buffer, byte[] array) {
-        for (int i = 0; i < BUFFER_SIZE; i++) {
+        for (int i = 0; i < bufferSize; i++) {
             buffer[i] = (byte) (buffer[i] ^ array[i]);
         }
     }

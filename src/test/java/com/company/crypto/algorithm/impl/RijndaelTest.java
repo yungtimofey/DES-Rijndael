@@ -1,12 +1,57 @@
 package com.company.crypto.algorithm.impl;
 
+import com.company.crypto.Cypher;
+import com.company.crypto.round.RoundKeysGenerator;
+import com.company.crypto.round.RoundTransformer;
+import com.company.crypto.round.impl.RoundKeyGeneratorRijndael;
+import com.company.crypto.round.impl.RoundTransformerRijndael;
 import com.company.polynomial.calculator.GaloisFieldPolynomialsCalculator;
+import com.company.polynomial.calculator.GaloisFieldPolynomialsCalculatorImpl;
 import com.company.polynomial.exception.WrongIrreduciblePolynomialException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class RijndaelTest {
+    RoundKeysGenerator roundKeysGenerator;
+    RoundTransformer roundTransformer;
+    static byte[][] roundKeys;
+
+    @Test
+    void checkEncodeAndDecode() {
+        roundTransformer = new RoundTransformerRijndael(
+                283,
+                Rijndael.RijndaelBlockSize.BIT_128,
+                new GaloisFieldPolynomialsCalculatorImpl()
+        );
+
+        roundKeysGenerator = new RoundKeyGeneratorRijndael(
+                283,
+                Rijndael.RijndaelBlockSize.BIT_128,
+                Rijndael.RijndaelBlockSize.BIT_256
+        );
+
+        byte[] cipherKey = {8, -99, (byte) -129, -123, -67, -3, -76, 66, 1, (byte) 255, 41, 12, 67, 3, 76, 66,
+                -1, 99, (byte) 129, -123, 67, 3, 7, 6, 1, (byte) 255, 41, 12, -72, 3, 76, -66
+        };
+        byte[] inputBlock = {1, (byte) -255, 10, -123, -67, -3, -76, 66, 0, -99, -41, 12, 67, 3, 76, 66};
+
+        Rijndael rijndael = new Rijndael(
+                roundKeysGenerator,
+                roundTransformer,
+                Rijndael.RijndaelBlockSize.BIT_128,
+                Rijndael.RijndaelBlockSize.BIT_256
+        );
+
+        rijndael.setKey(cipherKey);
+
+        byte[] encoded = rijndael.encode(inputBlock);
+        byte[] decoded = rijndael.decode(encoded);
+
+        assertArrayEquals(inputBlock, decoded);
+    }
+
+
     @Test
     void testSBox() throws WrongIrreduciblePolynomialException {
         int[] sBox = {

@@ -10,9 +10,7 @@ import java.util.concurrent.Callable;
 
 @Builder
 public class ECBDecodeFile implements Callable<Void> {
-    private static final int BUFFER_SIZE = 8;
-
-    private final byte[] buffer = new byte[BUFFER_SIZE];
+    private byte[] buffer;
 
     private final long filePositionToStart;
     private final long byteToEncode;
@@ -23,6 +21,8 @@ public class ECBDecodeFile implements Callable<Void> {
 
     @Override
     public Void call() throws IOException {
+        buffer = new byte[bufferSize];
+
         inputFile.seek(filePositionToStart);
         outputFile.seek(filePositionToStart);
 
@@ -34,7 +34,7 @@ public class ECBDecodeFile implements Callable<Void> {
             byte[] decoded = null;
 
             long allReadBytes = 0, read;
-            while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1 && allReadBytes <= byteToEncode) {
+            while ((read = inputStream.read(buffer, 0, bufferSize)) != -1 && allReadBytes <= byteToEncode) {
                 if (isFirstDecode) {
                     isFirstDecode = false;
                 } else {

@@ -11,9 +11,7 @@ import java.util.concurrent.Callable;
 
 @Builder
 public class ECBEncodeFile implements Callable<Void> {
-    private static final int BUFFER_SIZE = 8;
-
-    private final byte[] buffer = new byte[BUFFER_SIZE];
+    private byte[] buffer;
 
     private final long filePositionToStart;
     private final long byteToEncode;
@@ -24,6 +22,8 @@ public class ECBEncodeFile implements Callable<Void> {
 
     @Override
     public Void call() throws IOException {
+        buffer = new byte[bufferSize];
+
         inputFile.seek(filePositionToStart);
         outputFile.seek(filePositionToStart);
 
@@ -33,9 +33,9 @@ public class ECBEncodeFile implements Callable<Void> {
         ) {
             long allReadBytes = 0;
             long read;
-            while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1 && allReadBytes <= byteToEncode) {
-                if (read < BUFFER_SIZE) {
-                    PKCS7.doPadding(buffer, (int) (BUFFER_SIZE - read));
+            while ((read = inputStream.read(buffer, 0, bufferSize)) != -1 && allReadBytes <= byteToEncode) {
+                if (read < bufferSize) {
+                    PKCS7.doPadding(buffer, (int) (bufferSize - read));
                 }
 
                 byte[] encoded = algorithm.encode(buffer);

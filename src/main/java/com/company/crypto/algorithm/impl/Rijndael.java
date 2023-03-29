@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
-    private static int cipherKeyBitsNumber;
 
     public enum RijndaelBlockSize {
         BIT_128(128), BIT_192(192), BIT_256(256);
@@ -154,23 +153,20 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
 
     private final RoundKeysGenerator roundKeysGenerator;
     private final RoundTransformer roundTransformer;
-    private final int irreduciblePolynomial;
     private final int roundNumber;
+    private final int openTextBlockSizeInBytes;
     private byte[] cipherKey;
-
-   // TODO: made static method for init polynomial
 
     public Rijndael(
             RoundKeysGenerator roundKeysGenerator,
             RoundTransformer roundTransformer,
             Rijndael.RijndaelBlockSize openTextSize,
-            Rijndael.RijndaelBlockSize cipherKeySize,
-            int irreduciblePolynomial
+            Rijndael.RijndaelBlockSize cipherKeySize
     ) {
         this.roundKeysGenerator = roundKeysGenerator;
         this.roundTransformer = roundTransformer;
-        this.irreduciblePolynomial = irreduciblePolynomial;
         this.roundNumber = Rijndael.getRoundNumber(openTextSize, cipherKeySize);
+        this.openTextBlockSizeInBytes = openTextSize.bitsNumber / Byte.SIZE;
     }
 
     @Override
@@ -200,5 +196,10 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
     @Override
     public void setKey(byte[] cipherKey) {
         this.cipherKey = cipherKey;
+    }
+
+    @Override
+    public int getOpenTextBlockSizeInBytes() {
+        return openTextBlockSizeInBytes;
     }
 }

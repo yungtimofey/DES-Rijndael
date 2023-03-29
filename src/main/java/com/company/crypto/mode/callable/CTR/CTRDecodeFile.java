@@ -10,9 +10,7 @@ import java.util.concurrent.Callable;
 
 @Builder
 public class CTRDecodeFile implements Callable<Void> {
-    private static final int BUFFER_SIZE = 8;
-
-    private final byte[] buffer = new byte[BUFFER_SIZE];
+    private byte[] buffer;
 
     private final long filePositionToStart;
     private final long byteToEncode;
@@ -25,6 +23,8 @@ public class CTRDecodeFile implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
+        buffer = new byte[bufferSize];
+
         inputFile.seek(filePositionToStart);
         outputFile.seek(filePositionToStart);
 
@@ -36,9 +36,9 @@ public class CTRDecodeFile implements Callable<Void> {
             boolean isFirstDecode = true;
             byte[] encoded = null;
 
-            byte[] presentedDigit = new byte[BUFFER_SIZE];
+            byte[] presentedDigit = new byte[bufferSize];
             long allReadBytes = 0, read;
-            while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1 && allReadBytes <= byteToEncode) {
+            while ((read = inputStream.read(buffer, 0, bufferSize)) != -1 && allReadBytes <= byteToEncode) {
                 if (isFirstDecode) {
                     isFirstDecode = false;
                 } else {
@@ -60,7 +60,7 @@ public class CTRDecodeFile implements Callable<Void> {
         return null;
     }
     private void xor(byte[] buffer, byte[] array) {
-        for (int i = 0; i < BUFFER_SIZE; i++) {
+        for (int i = 0; i < bufferSize; i++) {
             buffer[i] = (byte) (buffer[i] ^ array[i]);
         }
     }

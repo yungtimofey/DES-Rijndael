@@ -9,7 +9,6 @@ import java.util.Arrays;
 
 
 public class OFBCypher extends SymmetricalBlockModeCypher {
-    private final byte[] buffer = new byte[BUFFER_SIZE];
     private final byte[] initialVector;
 
     public OFBCypher(SymmetricalBlockEncryptionAlgorithm algorithm, byte[] initialVector) {
@@ -23,13 +22,13 @@ public class OFBCypher extends SymmetricalBlockModeCypher {
                 InputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile));
                 OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
         ) {
-            byte[] toEncode = new byte[BUFFER_SIZE];
+            byte[] toEncode = new byte[bufferSize];
             System.arraycopy(initialVector, 0, toEncode, 0, initialVector.length);
 
             long read;
-            while ((read = inputStream.read(buffer, 0, BUFFER_SIZE)) != -1) {
-                if (read < BUFFER_SIZE) {
-                    PKCS7.doPadding(buffer, (int) (BUFFER_SIZE - read));
+            while ((read = inputStream.read(buffer, 0, bufferSize)) != -1) {
+                if (read < bufferSize) {
+                    PKCS7.doPadding(buffer, (int) (bufferSize - read));
                 }
 
                 byte[] encoded = algorithm.encode(toEncode);
@@ -50,12 +49,12 @@ public class OFBCypher extends SymmetricalBlockModeCypher {
         ) {
             Arrays.fill(buffer, (byte) 0);
 
-            byte[] xored = new byte[BUFFER_SIZE];
-            byte[] toEncode = new byte[BUFFER_SIZE];
+            byte[] xored = new byte[bufferSize];
+            byte[] toEncode = new byte[bufferSize];
             System.arraycopy(initialVector, 0, toEncode, 0, initialVector.length);
 
             boolean isFirstDecode = true;
-            while (inputStream.read(buffer, 0, BUFFER_SIZE) != -1) {
+            while (inputStream.read(buffer, 0, bufferSize) != -1) {
                 if (isFirstDecode) {
                     isFirstDecode = false;
                 } else {
@@ -67,7 +66,7 @@ public class OFBCypher extends SymmetricalBlockModeCypher {
 
                 xor(buffer, encoded);
 
-                System.arraycopy(buffer, 0, xored, 0, BUFFER_SIZE);
+                System.arraycopy(buffer, 0, xored, 0, bufferSize);
             }
             if (!isFirstDecode) {
                 int position = PKCS7.getPositionOfFinishByte(xored);
