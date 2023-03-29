@@ -14,9 +14,9 @@ class RoundKeyGeneratorRijndaelTest {
     @BeforeAll
     static void init() {
         roundKeyGeneratorRijndael = new RoundKeyGeneratorRijndael(
+                283,
                 Rijndael.RijndaelBlockSize.BIT_128,
-                Rijndael.RijndaelBlockSize.BIT_128,
-                283
+                Rijndael.RijndaelBlockSize.BIT_128
         );
     }
 

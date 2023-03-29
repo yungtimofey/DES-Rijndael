@@ -62,7 +62,7 @@ class RijndaelTest {
 
         byte[][] RCON = Rijndael.getRCON(283);
 
-        for (int i = 0; i < RCON.length; i++) {
+        for (int i = 0; i < rcon.length; i++) {
             int convertedByte = GaloisFieldPolynomialsCalculator.convertByteToInt(RCON[i][0]);
             if (convertedByte != rcon[i]) {
                 assert (false);

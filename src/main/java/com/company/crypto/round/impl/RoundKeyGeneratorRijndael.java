@@ -3,10 +3,7 @@ package com.company.crypto.round.impl;
 import com.company.crypto.algorithm.impl.Rijndael;
 import com.company.crypto.round.RoundKeysGenerator;
 import com.company.polynomial.calculator.GaloisFieldPolynomialsCalculator;
-import com.company.polynomial.calculator.GaloisFieldPolynomialsCalculatorImpl;
 import com.company.polynomial.exception.WrongIrreduciblePolynomialException;
-
-import java.nio.file.Path;
 
 public final class RoundKeyGeneratorRijndael implements RoundKeysGenerator {
     private final int openTextColumnNumber;
@@ -18,10 +15,10 @@ public final class RoundKeyGeneratorRijndael implements RoundKeysGenerator {
 
     // TODO: make polynomial check
     public RoundKeyGeneratorRijndael(
+            int irreduciblePolynomial,
             Rijndael.RijndaelBlockSize openTextSize,
-            Rijndael.RijndaelBlockSize cipherKeySize,
-            int irreduciblePolynomial) {
-
+            Rijndael.RijndaelBlockSize cipherKeySize
+    ) {
         this.openTextColumnNumber = openTextSize.bitsNumber / (ROW_NUMBER * Byte.SIZE);
         this.keyColumnNumber = cipherKeySize.bitsNumber / (ROW_NUMBER * Byte.SIZE);
         this.roundNumber = Rijndael.getRoundNumber(openTextSize, cipherKeySize);
@@ -32,51 +29,75 @@ public final class RoundKeyGeneratorRijndael implements RoundKeysGenerator {
 
     @Override
     public byte[][] generate(byte[] cipherKey) {
+        try {
+            return tryToGenerate(cipherKey);
+        } catch (WrongIrreduciblePolynomialException e) {
+            throw new IllegalStateException("Wrong polynomial:" + irreduciblePolynomial);
+        }
+
+//        for (int i = keyColumnNumber; i < W.length; i += keyColumnNumber) {
+//            System.arraycopy(W[i - 1], 0, tmpArray, 0, ROW_NUMBER);
+//            rotateArrayLeftOnce(tmpArray);
+//
+//            try {
+//                Rijndael.subByte(tmpArray, irreduciblePolynomial);
+//                XOR(W[i - keyColumnNumber], tmpArray, W[i]);
+//
+//                byte[][] CORN = Rijndael.getRCON(irreduciblePolynomial);
+//                byte[] currentCORN = CORN[i / keyColumnNumber - 1];
+//                XOR(W[i], currentCORN, W[i]);
+//            } catch (WrongIrreduciblePolynomialException e) {
+//                throw new IllegalStateException("Wrong polynomial:" + irreduciblePolynomial);
+//            }
+//
+//            if (keyColumnNumber <= 6) {
+//                for (int j = 1; j < keyColumnNumber && i + j < W.length; j++) {
+//                    XOR(W[i + j - keyColumnNumber], W[i + j - 1], W[i + j]);
+//                }
+//            } else {
+//                for (int j = 1; j < ROW_NUMBER; j++) {
+//                    XOR(W[i + j - keyColumnNumber], W[i + j - 1], W[i + j]);
+//                }
+//
+//                if (i + ROW_NUMBER >= W.length) {
+//                    break;
+//                }
+//
+//                System.arraycopy(W[i + ROW_NUMBER - 1], 0, tmpArray, 0, ROW_NUMBER);
+//                try {
+//                    Rijndael.subByte(tmpArray, irreduciblePolynomial);
+//                } catch (WrongIrreduciblePolynomialException e) {
+//                    throw new IllegalStateException("Wrong polynomial:" + irreduciblePolynomial);
+//                }
+//
+//                XOR(W[i + ROW_NUMBER - keyColumnNumber], tmpArray, W[i + ROW_NUMBER]);
+//                for (int j = ROW_NUMBER + 1; j < keyColumnNumber; j++) {
+//                    XOR(W[i + j - keyColumnNumber], W[i + j - 1], W[i + j]);
+//                }
+//            }
+//        }
+    }
+    private byte[][] tryToGenerate(byte[] cipherKey) throws WrongIrreduciblePolynomialException {
         byte[] tmpArray = new byte[ROW_NUMBER];
 
-        if (keyColumnNumber <= 6) {
-            setCipherKeyInW(cipherKey);
-            for (int i = keyColumnNumber; i < W.length; i += keyColumnNumber) {
-                System.arraycopy(W[i - 1], 0, tmpArray, 0, ROW_NUMBER);
+        setCipherKeyInW(cipherKey);
+        int i = keyColumnNumber;
+
+        byte[][] RCON = Rijndael.getRCON(irreduciblePolynomial);
+        while (i < openTextColumnNumber * (roundNumber + 1)) {
+            System.arraycopy(W[i - 1], 0, tmpArray, 0, ROW_NUMBER);
+            if (i % keyColumnNumber == 0) {
                 rotateArrayLeftOnce(tmpArray);
-
-                try {
-                    Rijndael.subByte(tmpArray, irreduciblePolynomial);
-                    XOR(W[i - keyColumnNumber], tmpArray, W[i]);
-
-                    byte[][] CORN = Rijndael.getRCON(irreduciblePolynomial);
-                    byte[] currentCORN = CORN[i / keyColumnNumber - 1];
-                    XOR(W[i], currentCORN, W[i]);
-                } catch (WrongIrreduciblePolynomialException e) {
-                    throw new IllegalStateException("Wrong polynomial:" + irreduciblePolynomial);
-                }
-
-                for (int j = 1; j < keyColumnNumber; j++) {
-                    XOR(W[i + j - keyColumnNumber], W[i + j - 1], W[i + j]);
-                }
+                Rijndael.subByte(tmpArray, irreduciblePolynomial);
+                XOR(tmpArray, RCON[i/keyColumnNumber - 1], tmpArray);
+            } else if (keyColumnNumber > 6 && i % keyColumnNumber == 4) {
+                Rijndael.subByte(tmpArray, irreduciblePolynomial);
             }
-        } else {
 
+            XOR(W[i - keyColumnNumber], tmpArray, W[i]);
+            i++;
         }
-
-        byte[] roundKey = new byte[ROW_NUMBER * openTextColumnNumber];
-        byte[][] roundKeys = new byte[roundNumber][ROW_NUMBER * openTextColumnNumber];
-
-        int numberOFCopiedKeys = 0;
-        int currentPositionForCopy = 0;
-        for (int i = keyColumnNumber; i < W.length; i++) {
-            byte[] currentW = W[i];
-
-            System.arraycopy(currentW, 0, roundKey, currentPositionForCopy, ROW_NUMBER);
-            currentPositionForCopy += ROW_NUMBER;
-
-            if (currentPositionForCopy == roundKey.length) {
-                System.arraycopy(roundKey, 0, roundKeys[numberOFCopiedKeys], 0, roundKey.length);
-                currentPositionForCopy = 0;
-                numberOFCopiedKeys++;
-            }
-        }
-        return roundKeys;
+        return getRoundKeysFromW();
     }
 
     private void setCipherKeyInW(byte[] cipherKey) {
@@ -99,5 +120,28 @@ public final class RoundKeyGeneratorRijndael implements RoundKeysGenerator {
             int secondInt = GaloisFieldPolynomialsCalculator.convertByteToInt(secondArray[i]);
             outArray[i] = GaloisFieldPolynomialsCalculator.convertIntToByte(firstInt ^ secondInt);
         }
+    }
+
+    private byte[][] getRoundKeysFromW() {
+        final int openTextBytes = ROW_NUMBER * openTextColumnNumber;
+
+        byte[] roundKey = new byte[ROW_NUMBER * openTextColumnNumber];
+        byte[][] roundKeys = new byte[roundNumber][ROW_NUMBER * openTextColumnNumber];
+
+        int numberOFCopiedKeys = 0;
+        int currentPositionForCopy = 0;
+        for (int i = openTextColumnNumber; i < W.length && numberOFCopiedKeys < roundNumber; i++) {
+            byte[] currentW = W[i];
+
+            System.arraycopy(currentW, 0, roundKey, currentPositionForCopy, ROW_NUMBER);
+            currentPositionForCopy += ROW_NUMBER;
+
+            if (currentPositionForCopy == openTextBytes) {
+                System.arraycopy(roundKey, 0, roundKeys[numberOFCopiedKeys], 0, roundKey.length);
+                currentPositionForCopy = 0;
+                numberOFCopiedKeys++;
+            }
+        }
+        return roundKeys;
     }
 }

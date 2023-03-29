@@ -5,13 +5,15 @@ import com.company.crypto.round.RoundTransformer;
 import com.company.polynomial.calculator.GaloisFieldPolynomialsCalculator;
 import com.company.polynomial.exception.WrongIrreduciblePolynomialException;
 
+import java.util.Arrays;
+
 public class RoundTransformerRijndael implements RoundTransformer {
-    private static final int ROW_NUMBER = 4;
+    private static final int COLUMN_NUMBER = 4;
 
     private final int irreduciblePolynomial;
     private final byte[][] inputBlockTransformed;
     private final byte[][] roundKeyTransformed;
-    private final int columnNumber;
+    private final int rowNumber;
     private final byte[] arrayForShift;
     private final GaloisFieldPolynomialsCalculator calculator;
 
@@ -21,18 +23,18 @@ public class RoundTransformerRijndael implements RoundTransformer {
             GaloisFieldPolynomialsCalculator galoisFieldPolynomialsCalculator
     ) {
         this.irreduciblePolynomial = irreduciblePolynomial;
-        this.columnNumber = openTextSize.bitsNumber / ROW_NUMBER / 8;
+        this.rowNumber = openTextSize.bitsNumber / COLUMN_NUMBER / 8;
         this.calculator = galoisFieldPolynomialsCalculator;
 
-        this.inputBlockTransformed = new byte[ROW_NUMBER][columnNumber];
-        this.roundKeyTransformed = new byte[ROW_NUMBER][columnNumber];
-        this.arrayForShift = new byte[columnNumber];
+        this.inputBlockTransformed = new byte[rowNumber][COLUMN_NUMBER];
+        this.roundKeyTransformed = new byte[rowNumber][COLUMN_NUMBER];
+        this.arrayForShift = new byte[rowNumber];
     }
 
     @Override
     public byte[] encode(byte[] inputBlock, byte[] roundKey, boolean predicate) {
         try {
-            return tryToEncode(inputBlock, roundKey, predicate);
+            return tryToEncode(Arrays.copyOf(inputBlock, inputBlock.length), roundKey, predicate);
         } catch (WrongIrreduciblePolynomialException e) {
             throw new IllegalStateException("Wrong Polynomial:" + irreduciblePolynomial);
         }
@@ -54,22 +56,22 @@ public class RoundTransformerRijndael implements RoundTransformer {
     private void transformArray(byte[] inputBlock, byte[][] inputBlockTransformed) {
         int numberOfSavedTransformedInputBlocks = 0;
         for (int i = 0; i < inputBlock.length; i++) {
-            inputBlockTransformed[numberOfSavedTransformedInputBlocks][i % columnNumber] = inputBlock[i];
-            if (i != 0 && i % columnNumber == 0) {
+            inputBlockTransformed[numberOfSavedTransformedInputBlocks][i % COLUMN_NUMBER] = inputBlock[i];
+            if (i != 0 && (i+1) % COLUMN_NUMBER == 0) {
                 numberOfSavedTransformedInputBlocks++;
             }
         }
     }
 
     private void shiftRows(byte[][] transformedInputBlock) {
-        for (int i = 0; i < ROW_NUMBER; i += columnNumber) {
-            for (int j = 0; j < columnNumber; j++) {
+        for (int i = 0; i < COLUMN_NUMBER; i++) {
+            for (int j = 0; j < rowNumber; j++) {
                 arrayForShift[j] = transformedInputBlock[j][i];
             }
 
             shiftArrayLeft(arrayForShift, i);
 
-            for (int j = 0; j < columnNumber; j++) {
+            for (int j = 0; j < rowNumber; j++) {
                 transformedInputBlock[j][i] = arrayForShift[j];
             }
         }
@@ -143,7 +145,7 @@ public class RoundTransformerRijndael implements RoundTransformer {
     @Override
     public byte[] decode(byte[] inputBlock, byte[] roundKey, boolean isFirstRound) {
         try {
-            return tryToEncode(inputBlock, roundKey, isFirstRound);
+            return tryToDecode(Arrays.copyOf(inputBlock, inputBlock.length), roundKey, isFirstRound);
         } catch (WrongIrreduciblePolynomialException e) {
             throw new IllegalStateException("Wrong Polynomial:" + irreduciblePolynomial);
         }
@@ -203,14 +205,14 @@ public class RoundTransformerRijndael implements RoundTransformer {
     }
 
     private void inverseShiftRows(byte[][] transformedInputBlock) {
-        for (int i = 0; i < ROW_NUMBER; i += columnNumber) {
-            for (int j = 0; j < columnNumber; j++) {
+        for (int i = 0; i < COLUMN_NUMBER; i++) {
+            for (int j = 0; j < rowNumber; j++) {
                 arrayForShift[j] = transformedInputBlock[j][i];
             }
 
             shiftArrayRight(arrayForShift, i);
 
-            for (int j = 0; j < columnNumber; j++) {
+            for (int j = 0; j < rowNumber; j++) {
                 transformedInputBlock[j][i] = arrayForShift[j];
             }
         }
