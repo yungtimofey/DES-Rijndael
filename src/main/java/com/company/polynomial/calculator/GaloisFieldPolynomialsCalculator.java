@@ -23,12 +23,18 @@ public interface GaloisFieldPolynomialsCalculator {
 
     static byte convertIntToByte(int polynomial) {
         byte converted = 0;
-        converted |= polynomial;
+        for (int i = 0; i < Byte.SIZE; i++) {
+            converted |= polynomial & (1 << i);
+        }
         return converted;
     }
 
     static int convertByteToInt(byte polynomial) {
-        return (polynomial & 0xFF);
+        int converted = 0;
+        for (int i = 0; i < Byte.SIZE; i++) {
+            converted |= polynomial & (1 << i);
+        }
+        return converted;
     }
 
     static String polynomialToString(byte polynomial) {

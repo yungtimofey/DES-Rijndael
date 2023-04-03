@@ -26,8 +26,6 @@ Wsrc/main/java/com/company/polynomial/exception/WrongIrreduciblePolynomialExcept
 1.txt,3\5\3586c170e3e4262f0eb95a0cc24c5ebb3de14504
 c
 3src/main/java/com/company/crypto/padding/PKCS7.java,2\c\2cabc46f57ecb32139cdea172636be0b3f531e08
-‰
-Ysrc/test/java/com/company/polynomial/calculator/GaliosFieldPolynomialsCalculatorTest.java,1\2\128db6c66eada0340ac4b19c8e6b2f4bcc278bc8
 v
 Fsrc/main/java/com/company/crypto/round/impl/RoundKeysGeneratorDES.java,f\5\f59e855f208f3ffa0ab2f1cf9b4e9da1d0891f55
 o
