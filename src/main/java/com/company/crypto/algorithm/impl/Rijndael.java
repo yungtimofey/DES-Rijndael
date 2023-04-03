@@ -17,6 +17,7 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
         BIT_128(128), BIT_192(192), BIT_256(256);
 
         public final int bitsNumber;
+
         RijndaelBlockSize(int bitsNumber) {
             this.bitsNumber = bitsNumber;
         }
@@ -35,6 +36,7 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
         // TODO: make copy
         return sBoxAndItsIrreduciblePolynomial.get(irreduciblePolynomial);
     }
+
     private static byte[] generateSBox(int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
         byte[] sBox = new byte[S_BOX_SIZE * S_BOX_SIZE];
         for (int i = 0; i < sBox.length; i++) {
@@ -43,13 +45,14 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
 
             int toMakeAffineTransform = GaloisFieldPolynomialsCalculator.convertByteToInt(reversed);
             for (int k = 0; k < 4; k++) {
-                int shifted = GaloisFieldPolynomialsCalculator.convertByteToInt(madeLeftCycleShit(reversed, k+1));
+                int shifted = GaloisFieldPolynomialsCalculator.convertByteToInt(madeLeftCycleShit(reversed, k + 1));
                 toMakeAffineTransform ^= shifted;
             }
-            sBox[i] = GaloisFieldPolynomialsCalculator.convertIntToByte (toMakeAffineTransform ^ 99);
+            sBox[i] = GaloisFieldPolynomialsCalculator.convertIntToByte(toMakeAffineTransform ^ 99);
         }
         return sBox;
     }
+
     private static byte madeLeftCycleShit(byte b, int shift) {
         int translatedB = GaloisFieldPolynomialsCalculator.convertByteToInt(b);
         int shifted = (translatedB << shift) | (translatedB >> (Byte.SIZE - shift));
@@ -57,6 +60,7 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
     }
 
     private static byte[][] RCON = null;
+
     public static byte[][] getRCON(int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
         if (RCON == null) {
             final int RCONSize = 256;
@@ -64,7 +68,7 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
 
             rc[0] = 1;
             for (int i = 1; i < rc.length; i++) {
-                rc[i] = galoisFieldPolynomialsCalculator.multi(rc[i-1], (byte)2, irreduciblePolynomial);
+                rc[i] = galoisFieldPolynomialsCalculator.multi(rc[i - 1], (byte) 2, irreduciblePolynomial);
             }
 
             RCON = new byte[RCONSize][4];
@@ -79,60 +83,78 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
 
     public static void subByte(byte[] array, int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
         byte[] sBox = getSBox(irreduciblePolynomial);
+        char[] hexArrayForSBlock = new char[2];
         for (int i = 0; i < array.length; i++) {
-            int row = getRow(array[i]);
-            int column = getColumn(array[i]);
+            int row = getRow(array[i], hexArrayForSBlock);
+            int column = getColumn(array[i], hexArrayForSBlock);
             array[i] = sBox[row * S_BOX_SIZE + column];
         }
     }
-    private static int getRow(byte digit) {
-        int intDigit = GaloisFieldPolynomialsCalculator.convertByteToInt(digit);
-        String hexDigit = Integer.toHexString(intDigit);
 
-        if (hexDigit.length() == 1) {
+    private static int getRow(byte digit, char[] hexArrayForSBlock) {
+        int intDigit = GaloisFieldPolynomialsCalculator.convertByteToInt(digit);
+        toHexArray(intDigit, hexArrayForSBlock);
+
+        if (hexArrayForSBlock[1] == 0) {
             return 0;
         }
 
-        char c = Integer.toHexString(intDigit).charAt(0);
+        char c = hexArrayForSBlock[0];
         return Character.isDigit(c) ? c - '0' : c - 'a' + 10;
     }
-    private static int getColumn(byte digit) {
+
+    private static int getColumn(byte digit, char[] hexArrayForSBlock) {
         int intDigit = GaloisFieldPolynomialsCalculator.convertByteToInt(digit);
-        String hexDigit = Integer.toHexString(intDigit);
+        toHexArray(intDigit, hexArrayForSBlock);
 
         char c;
-        if (hexDigit.length() == 1) {
-            c = Integer.toHexString(intDigit).charAt(0);
+        if (hexArrayForSBlock[1] == 0) {
+            c = hexArrayForSBlock[0];
         } else {
-            c = Integer.toHexString(intDigit).charAt(1);
+            c = hexArrayForSBlock[1];
         }
         return Character.isDigit(c) ? c - '0' : c - 'a' + 10;
+    }
+
+    private static void toHexArray(int digit, char[] hexArrayForSBlock) {
+        hexArrayForSBlock[1] = (char) (
+                (digit % 16) < 10
+                        ? digit % 16 + '0'
+                        : digit % 16 + 'a' - 10);
+        hexArrayForSBlock[0] = (char) (
+                (digit / 16) < 10
+                        ? digit / 16 + '0'
+                        : digit / 16 + 'a' - 10);
     }
 
     public static void inverseSubByte(byte[] array, int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
+        char[] hexArrayForSBlock = new char[2];
         byte[] inverseSBox = getInverseSBox(irreduciblePolynomial);
         for (int i = 0; i < array.length; i++) {
-            int row = getRow(array[i]);
-            int column = getColumn(array[i]);
+            int row = getRow(array[i], hexArrayForSBlock);
+            int column = getColumn(array[i], hexArrayForSBlock);
             array[i] = inverseSBox[row * S_BOX_SIZE + column];
         }
     }
+
     public static byte[] getInverseSBox(int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
         if (!inverseSBoxAndItsIrreduciblePolynomial.containsKey(irreduciblePolynomial)) {
             inverseSBoxAndItsIrreduciblePolynomial.put(irreduciblePolynomial, generateInverseSBox(irreduciblePolynomial));
         }
         return inverseSBoxAndItsIrreduciblePolynomial.get(irreduciblePolynomial);
     }
+
     private static byte[] generateInverseSBox(int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
         byte[] inverseSBox = new byte[S_BOX_SIZE * S_BOX_SIZE];
         byte[] sBox = getSBox(irreduciblePolynomial);
+        char[] hexArrayForSBlock = new char[2];
 
         for (int i = 0; i < inverseSBox.length; i++) {
-            int row = getRow(sBox[i]);
-            int column = getColumn(sBox[i]);
+            int row = getRow(sBox[i], hexArrayForSBlock);
+            int column = getColumn(sBox[i], hexArrayForSBlock);
 
             byte iInt = GaloisFieldPolynomialsCalculator.convertIntToByte(i);
-            int toSet = getRow(iInt) * S_BOX_SIZE + getColumn(iInt);
+            int toSet = getRow(iInt, hexArrayForSBlock) * S_BOX_SIZE + getColumn(iInt, hexArrayForSBlock);
             inverseSBox[row * S_BOX_SIZE + column] = GaloisFieldPolynomialsCalculator.convertIntToByte(toSet);
         }
         return inverseSBox;
@@ -176,8 +198,8 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
         Objects.requireNonNull(cipherKey);
 
         byte[][] roundKeys = roundKeysGenerator.generate(cipherKey);
-        for (int i = 0;  i < roundNumber; i++) {
-            inputBlock = roundTransformer.encode(Arrays.copyOf(inputBlock, inputBlock.length), roundKeys[i], i == roundNumber-1);
+        for (int i = 0; i < roundNumber; i++) {
+            inputBlock = roundTransformer.encode(Arrays.copyOf(inputBlock, inputBlock.length), roundKeys[i], i == roundNumber - 1);
         }
         return inputBlock;
     }
@@ -188,8 +210,8 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
         Objects.requireNonNull(cipherKey);
 
         byte[][] roundKeys = roundKeysGenerator.generate(cipherKey);
-        for (int i = 0;  i < roundNumber; i++) {
-            inputBlock = roundTransformer.decode(Arrays.copyOf(inputBlock, inputBlock.length), roundKeys[i], i == roundNumber-1);
+        for (int i = 0; i < roundNumber; i++) {
+            inputBlock = roundTransformer.decode(Arrays.copyOf(inputBlock, inputBlock.length), roundKeys[i], i == roundNumber - 1);
         }
         return inputBlock;
     }

@@ -81,11 +81,6 @@ public final class GaloisFieldPolynomialsCalculatorImpl implements GaloisFieldPo
     }
 
     @Override
-    public byte minus(byte firstPolynomial, byte secondPolynomial) {
-        return (byte) (firstPolynomial ^ secondPolynomial);
-    }
-
-    @Override
     public byte multi(byte firstPolynomial, byte secondPolynomial, int irreduciblePolynomial) throws WrongIrreduciblePolynomialException {
         if (!polynomialIsIrreducible(irreduciblePolynomial)) {
             throw new WrongIrreduciblePolynomialException();
@@ -130,10 +125,6 @@ public final class GaloisFieldPolynomialsCalculatorImpl implements GaloisFieldPo
     }
 
     int minusForInt(int firstPolynomial, int secondPolynomial) {
-        return firstPolynomial ^ secondPolynomial;
-    }
-
-    int plusForInt(int firstPolynomial, int secondPolynomial) {
         return firstPolynomial ^ secondPolynomial;
     }
 

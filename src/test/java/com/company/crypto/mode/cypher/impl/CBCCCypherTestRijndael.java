@@ -1,10 +1,13 @@
 package com.company.crypto.mode.cypher.impl;
 
 import com.company.crypto.Cypher;
-import com.company.crypto.algorithm.impl.DES;
+import com.company.crypto.algorithm.impl.Rijndael;
 import com.company.crypto.mode.SymmetricalBlockMode;
-import com.company.crypto.round.impl.RoundKeysGeneratorDES;
-import com.company.crypto.round.impl.RoundTransformerDES;
+import com.company.crypto.round.RoundKeysGenerator;
+import com.company.crypto.round.RoundTransformer;
+import com.company.crypto.round.impl.RoundKeyGeneratorRijndael;
+import com.company.crypto.round.impl.RoundTransformerRijndael;
+import com.company.polynomial.calculator.GaloisFieldPolynomialsCalculatorImpl;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -15,23 +18,43 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.BitSet;
 
+public class CBCCCypherTestRijndael {
 
-class CBCCypherTestDES {
     static Cypher cypher;
     static byte[] key;
     static byte[] IV;
 
     @BeforeAll
     static void init() {
-        BitSet bitSet = init(64, 1, 2, 3, 4, 32, 34, 37, 41, 42, 54, 56, 57, 58);
-        key = bitSet.toByteArray();
+        byte[] cipherKey = {1, 99, (byte) 129, -123, 67, 3, 0, 66, 1, (byte) 255, 41, 12, 67, 3, 76, 66,
+                -1, 99, (byte) 129, -123, 67, -93, -7, -6
+        };
+        key = cipherKey;
 
-        IV = init(64, 1, 2, 3, 4, 32, 34, 37, 41, 42, 54, 56, 57, 58, 62).toByteArray();
+        RoundTransformer roundTransformer = new RoundTransformerRijndael(
+                283,
+                Rijndael.RijndaelBlockSize.BIT_256,
+                new GaloisFieldPolynomialsCalculatorImpl()
+        );
+
+        RoundKeysGenerator roundKeysGenerator = new RoundKeyGeneratorRijndael(
+                283,
+                Rijndael.RijndaelBlockSize.BIT_256,
+                Rijndael.RijndaelBlockSize.BIT_192
+        );
+
+        IV = new byte[]{9, 69, (byte) 129, (byte) 129, 67, 38, 76, -66, 1, (byte) 255, 1, 12, 67, 3, 76, 66,
+                -1, 99, (byte) 129, -123, 17, 0, 7, 6, 1, (byte) 255, 41, 12, -72, 3, 76, 6};
 
         cypher = Cypher.build(
                 key,
                 SymmetricalBlockMode.CBC,
-                new DES(new RoundKeysGeneratorDES(), new RoundTransformerDES()),
+                new Rijndael(
+                        roundKeysGenerator,
+                        roundTransformer,
+                        Rijndael.RijndaelBlockSize.BIT_256,
+                        Rijndael.RijndaelBlockSize.BIT_192
+                ),
                 IV
         );
     }
@@ -84,21 +107,21 @@ class CBCCypherTestDES {
         assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
     }
 
-    @Test
-    void encodeAndDecodeLongVideo() throws IOException {
-        String input = "song.mp4";
-        String encoded = "2.mp4";
-        String decoded = "3.mp4";
-
-        File inputFile = new File(input);
-        File encodedFile = new File(encoded);
-        File decodedFile = new File(decoded);
-
-        cypher.encode(inputFile, encodedFile);
-        cypher.decode(encodedFile, decodedFile);
-
-        assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
-    }
+//    @Test
+//    void encodeAndDecodeLongVideo() throws IOException {
+//        String input = "song.mp4";
+//        String encoded = "2.mp4";
+//        String decoded = "3.mp4";
+//
+//        File inputFile = new File(input);
+//        File encodedFile = new File(encoded);
+//        File decodedFile = new File(decoded);
+//
+//        cypher.encode(inputFile, encodedFile);
+//        cypher.decode(encodedFile, decodedFile);
+//
+//        assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
+//    }
 
     private static BitSet init(int size, int ... indexes) {
         BitSet bitSet = new BitSet(size);

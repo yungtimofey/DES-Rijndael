@@ -17,6 +17,10 @@ public class OFBFabric implements SymmetricalBlockCypherFabric {
             throw new IllegalArgumentException("Wrong args length. No init vector");
         }
 
-        return new OFBCypher(algorithm, (byte[])(args[positionOfInitialVector]));
+        byte[] IV = (byte[])(args[positionOfInitialVector]);
+        if (IV.length != algorithm.getOpenTextBlockSizeInBytes()) {
+            throw new IllegalArgumentException("Wrong IV size");
+        }
+        return new OFBCypher(algorithm, IV);
     }
 }

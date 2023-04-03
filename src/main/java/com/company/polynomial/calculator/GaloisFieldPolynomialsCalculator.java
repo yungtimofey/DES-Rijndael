@@ -13,10 +13,7 @@ public interface GaloisFieldPolynomialsCalculator {
         int y;
     }
 
-
     byte sum(byte... polynomials);
-
-    byte minus(byte firstPolynomial, byte secondPolynomial);
 
     byte multi(byte firstPolynomial, byte secondPolynomial, int irreduciblePolynomial) throws WrongIrreduciblePolynomialException;
 
@@ -24,21 +21,14 @@ public interface GaloisFieldPolynomialsCalculator {
 
     byte getReverse(byte polynomial, int irreduciblePolynomial) throws WrongIrreduciblePolynomialException;
 
-
     static byte convertIntToByte(int polynomial) {
         byte converted = 0;
-        for (int i = 0; i < Byte.SIZE; i++) {
-            converted |= polynomial & (1 << i);
-        }
+        converted |= polynomial;
         return converted;
     }
 
     static int convertByteToInt(byte polynomial) {
-        int converted = 0;
-        for (int i = 0; i < Byte.SIZE; i++) {
-            converted |= polynomial & (1 << i);
-        }
-        return converted;
+        return (polynomial & 0xFF);
     }
 
     static String polynomialToString(byte polynomial) {
