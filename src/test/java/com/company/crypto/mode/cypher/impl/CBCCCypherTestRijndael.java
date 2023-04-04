@@ -7,6 +7,7 @@ import com.company.crypto.round.RoundKeysGenerator;
 import com.company.crypto.round.RoundTransformer;
 import com.company.crypto.round.impl.RoundKeyGeneratorRijndael;
 import com.company.crypto.round.impl.RoundTransformerRijndael;
+import com.company.polynomial.calculator.GaloisFieldPolynomialsCalculator;
 import com.company.polynomial.calculator.GaloisFieldPolynomialsCalculatorImpl;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.BitSet;
+import java.util.List;
 
 public class CBCCCypherTestRijndael {
 
@@ -31,14 +33,17 @@ public class CBCCCypherTestRijndael {
         };
         key = cipherKey;
 
+        GaloisFieldPolynomialsCalculator galoisFieldPolynomialsCalculator = new GaloisFieldPolynomialsCalculatorImpl();
+        List<Integer> list = galoisFieldPolynomialsCalculator.getAllIrreduciblePolynomials();
+
         RoundTransformer roundTransformer = new RoundTransformerRijndael(
-                283,
+                list.get(0),
                 Rijndael.RijndaelBlockSize.BIT_256,
                 new GaloisFieldPolynomialsCalculatorImpl()
         );
 
         RoundKeysGenerator roundKeysGenerator = new RoundKeyGeneratorRijndael(
-                283,
+                list.get(0),
                 Rijndael.RijndaelBlockSize.BIT_256,
                 Rijndael.RijndaelBlockSize.BIT_192
         );
@@ -49,11 +54,11 @@ public class CBCCCypherTestRijndael {
         cypher = Cypher.build(
                 key,
                 SymmetricalBlockMode.CBC,
-                new Rijndael(
-                        roundKeysGenerator,
-                        roundTransformer,
-                        Rijndael.RijndaelBlockSize.BIT_256,
-                        Rijndael.RijndaelBlockSize.BIT_192
+                Rijndael.getInstance(
+                    roundKeysGenerator,
+                    roundTransformer,
+                    Rijndael.RijndaelBlockSize.BIT_256,
+                    Rijndael.RijndaelBlockSize.BIT_192
                 ),
                 IV
         );

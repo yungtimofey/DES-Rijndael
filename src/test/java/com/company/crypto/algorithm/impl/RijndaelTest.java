@@ -36,7 +36,7 @@ class RijndaelTest {
         };
         byte[] inputBlock = {1, (byte) -255, 10, -123, -67, -3, -76, 66, 0, -99, -41, 12, 67, 3, 76, 66};
 
-        Rijndael rijndael = new Rijndael(
+        Rijndael rijndael = Rijndael.getInstance(
                 roundKeysGenerator,
                 roundTransformer,
                 Rijndael.RijndaelBlockSize.BIT_128,

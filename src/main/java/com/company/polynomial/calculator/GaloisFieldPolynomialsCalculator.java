@@ -21,6 +21,7 @@ public interface GaloisFieldPolynomialsCalculator {
 
     byte getReverse(byte polynomial, int irreduciblePolynomial) throws WrongIrreduciblePolynomialException;
 
+
     static byte convertIntToByte(int polynomial) {
         byte converted = 0;
         for (int i = 0; i < Byte.SIZE; i++) {

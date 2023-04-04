@@ -3,6 +3,8 @@ package com.company.crypto.algorithm.impl;
 import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
 import com.company.crypto.round.RoundKeysGenerator;
 import com.company.crypto.round.RoundTransformer;
+import com.company.crypto.round.impl.RoundKeyGeneratorRijndael;
+import com.company.crypto.round.impl.RoundTransformerRijndael;
 import com.company.polynomial.calculator.GaloisFieldPolynomialsCalculator;
 import com.company.polynomial.calculator.GaloisFieldPolynomialsCalculatorImpl;
 import com.company.polynomial.exception.WrongIrreduciblePolynomialException;
@@ -180,7 +182,42 @@ public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
     private final int openTextBlockSizeInBytes;
     private byte[] cipherKey;
 
-    public Rijndael(
+    public static Rijndael getInstance(
+            RoundKeysGenerator roundKeysGenerator,
+            RoundTransformer roundTransformer,
+            Rijndael.RijndaelBlockSize openTextSize,
+            Rijndael.RijndaelBlockSize cipherKeySize) {
+
+        if (!(roundKeysGenerator instanceof RoundKeyGeneratorRijndael)) {
+            throw new IllegalArgumentException("Wrong roundKeysGenerator!");
+        }
+        if (!(roundTransformer instanceof RoundTransformerRijndael)) {
+            throw new IllegalArgumentException("Wrong roundTransformer!");
+        }
+
+        RoundTransformerRijndael roundTransformerRijndael = (RoundTransformerRijndael) roundTransformer;
+        RoundKeyGeneratorRijndael roundKeyGeneratorRijndael = (RoundKeyGeneratorRijndael) roundKeysGenerator;
+
+        if (roundKeyGeneratorRijndael.getIrreduciblePolynomial() != roundTransformerRijndael.getIrreduciblePolynomial()) {
+            throw new IllegalArgumentException("Polynomial in roundKeyGenerator and in roundTransformer are not equals");
+        }
+
+        if (!GaloisFieldPolynomialsCalculatorImpl.polynomialIsIrreducible(roundKeyGeneratorRijndael.getIrreduciblePolynomial())) {
+            throw new IllegalArgumentException("Polynomial is not irreducible!");
+        }
+
+        if (openTextSize != roundKeyGeneratorRijndael.getOpenTextSize() || openTextSize != roundTransformerRijndael.getOpenTextSize()) {
+            throw new IllegalArgumentException("No equals open text size!");
+        }
+
+        if (cipherKeySize != roundKeyGeneratorRijndael.getCipherKeySize()) {
+            throw new IllegalArgumentException("No equals cipher key size!");
+        }
+
+        return new Rijndael(roundKeysGenerator, roundTransformer, openTextSize, cipherKeySize);
+    }
+
+    private Rijndael(
             RoundKeysGenerator roundKeysGenerator,
             RoundTransformer roundTransformer,
             Rijndael.RijndaelBlockSize openTextSize,

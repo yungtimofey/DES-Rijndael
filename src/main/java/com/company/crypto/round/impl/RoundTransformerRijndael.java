@@ -5,7 +5,6 @@ import com.company.crypto.round.RoundTransformer;
 import com.company.polynomial.calculator.GaloisFieldPolynomialsCalculator;
 import com.company.polynomial.exception.WrongIrreduciblePolynomialException;
 
-import java.util.Arrays;
 
 public class RoundTransformerRijndael implements RoundTransformer {
     private static final int COLUMN_NUMBER = 4;
@@ -16,6 +15,16 @@ public class RoundTransformerRijndael implements RoundTransformer {
     private final int rowNumber;
     private final byte[] arrayForShift;
     private final GaloisFieldPolynomialsCalculator calculator;
+
+    private final Rijndael.RijndaelBlockSize openTextSize;
+
+    public Rijndael.RijndaelBlockSize getOpenTextSize() {
+        return openTextSize;
+    }
+
+    public int getIrreduciblePolynomial() {
+        return irreduciblePolynomial;
+    }
 
     public RoundTransformerRijndael(
             int irreduciblePolynomial,
@@ -29,6 +38,8 @@ public class RoundTransformerRijndael implements RoundTransformer {
         this.inputBlockTransformed = new byte[rowNumber][COLUMN_NUMBER];
         this.roundKeyTransformed = new byte[rowNumber][COLUMN_NUMBER];
         this.arrayForShift = new byte[rowNumber];
+
+        this.openTextSize = openTextSize;
     }
 
     @Override

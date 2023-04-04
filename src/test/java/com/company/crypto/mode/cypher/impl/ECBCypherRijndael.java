@@ -47,7 +47,7 @@ public class ECBCypherRijndael {
         cypher = Cypher.build(
                 key,
                 SymmetricalBlockMode.ECB,
-                new Rijndael(
+                Rijndael.getInstance(
                         roundKeysGenerator,
                         roundTransformer,
                         Rijndael.RijndaelBlockSize.BIT_128,

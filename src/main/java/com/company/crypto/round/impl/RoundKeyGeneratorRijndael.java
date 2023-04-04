@@ -13,7 +13,9 @@ public final class RoundKeyGeneratorRijndael implements RoundKeysGenerator {
     private final int irreduciblePolynomial;
     private static final int ROW_NUMBER = 4;
 
-    // TODO: make polynomial check
+    private final Rijndael.RijndaelBlockSize openTextSize;
+    private final Rijndael.RijndaelBlockSize cipherKeySize;
+
     public RoundKeyGeneratorRijndael(
             int irreduciblePolynomial,
             Rijndael.RijndaelBlockSize openTextSize,
@@ -25,6 +27,9 @@ public final class RoundKeyGeneratorRijndael implements RoundKeysGenerator {
         this.W = new byte[openTextColumnNumber * (roundNumber + 1)][ROW_NUMBER];
 
         this.irreduciblePolynomial = irreduciblePolynomial;
+
+        this.openTextSize = openTextSize;
+        this.cipherKeySize = cipherKeySize;
     }
 
     @Override
@@ -34,48 +39,6 @@ public final class RoundKeyGeneratorRijndael implements RoundKeysGenerator {
         } catch (WrongIrreduciblePolynomialException e) {
             throw new IllegalStateException("Wrong polynomial:" + irreduciblePolynomial);
         }
-
-//        for (int i = keyColumnNumber; i < W.length; i += keyColumnNumber) {
-//            System.arraycopy(W[i - 1], 0, tmpArray, 0, ROW_NUMBER);
-//            rotateArrayLeftOnce(tmpArray);
-//
-//            try {
-//                Rijndael.subByte(tmpArray, irreduciblePolynomial);
-//                XOR(W[i - keyColumnNumber], tmpArray, W[i]);
-//
-//                byte[][] CORN = Rijndael.getRCON(irreduciblePolynomial);
-//                byte[] currentCORN = CORN[i / keyColumnNumber - 1];
-//                XOR(W[i], currentCORN, W[i]);
-//            } catch (WrongIrreduciblePolynomialException e) {
-//                throw new IllegalStateException("Wrong polynomial:" + irreduciblePolynomial);
-//            }
-//
-//            if (keyColumnNumber <= 6) {
-//                for (int j = 1; j < keyColumnNumber && i + j < W.length; j++) {
-//                    XOR(W[i + j - keyColumnNumber], W[i + j - 1], W[i + j]);
-//                }
-//            } else {
-//                for (int j = 1; j < ROW_NUMBER; j++) {
-//                    XOR(W[i + j - keyColumnNumber], W[i + j - 1], W[i + j]);
-//                }
-//
-//                if (i + ROW_NUMBER >= W.length) {
-//                    break;
-//                }
-//
-//                System.arraycopy(W[i + ROW_NUMBER - 1], 0, tmpArray, 0, ROW_NUMBER);
-//                try {
-//                    Rijndael.subByte(tmpArray, irreduciblePolynomial);
-//                } catch (WrongIrreduciblePolynomialException e) {
-//                    throw new IllegalStateException("Wrong polynomial:" + irreduciblePolynomial);
-//                }
-//
-//                XOR(W[i + ROW_NUMBER - keyColumnNumber], tmpArray, W[i + ROW_NUMBER]);
-//                for (int j = ROW_NUMBER + 1; j < keyColumnNumber; j++) {
-//                    XOR(W[i + j - keyColumnNumber], W[i + j - 1], W[i + j]);
-//                }
-//            }
-//        }
     }
     private byte[][] tryToGenerate(byte[] cipherKey) throws WrongIrreduciblePolynomialException {
         byte[] tmpArray = new byte[ROW_NUMBER];
@@ -143,5 +106,17 @@ public final class RoundKeyGeneratorRijndael implements RoundKeysGenerator {
             }
         }
         return roundKeys;
+    }
+
+    public int getIrreduciblePolynomial() {
+        return irreduciblePolynomial;
+    }
+
+    public Rijndael.RijndaelBlockSize getOpenTextSize() {
+        return openTextSize;
+    }
+
+    public Rijndael.RijndaelBlockSize getCipherKeySize() {
+        return cipherKeySize;
     }
 }

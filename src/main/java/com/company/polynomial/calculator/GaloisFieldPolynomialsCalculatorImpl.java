@@ -12,7 +12,7 @@ import java.util.stream.IntStream;
  * 2^8 Galois field calculator. 283 irreducible polynomial default
  **/
 public final class GaloisFieldPolynomialsCalculatorImpl implements GaloisFieldPolynomialsCalculator {
-    static boolean polynomialIsIrreducible(int polynomial) {
+    public static boolean polynomialIsIrreducible(int polynomial) {
         if (polynomial < 2) {
             return false;
         }
@@ -26,7 +26,6 @@ public final class GaloisFieldPolynomialsCalculatorImpl implements GaloisFieldPo
         }
         return true;
     }
-
     static byte mod(int firstPolynomial, int secondPolynomial) {
         if (secondPolynomial == 1) {
             return 0;
