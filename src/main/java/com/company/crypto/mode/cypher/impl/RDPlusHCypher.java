@@ -1,15 +1,10 @@
 package com.company.crypto.mode.cypher.impl;
 
 import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
-import com.company.crypto.mode.callable.RDPlusH.RDPlusHEncode;
 import com.company.crypto.mode.cypher.SymmetricalBlockModeCypher;
 import com.company.crypto.padding.PKCS7;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.Callable;
 
 public class RDPlusHCypher extends SymmetricalBlockModeCypher {
     private final long startDigit;
@@ -33,57 +28,32 @@ public class RDPlusHCypher extends SymmetricalBlockModeCypher {
 
     @Override
     public void encode(File inputFile, File outputFile) throws IOException {
-        long fileLengthInByte = inputFile.length();
-        long blockNumber = fileLengthInByte / bufferSize;
+        try (
+                InputStream inputStream = new BufferedInputStream(new FileInputStream(inputFile));
+                OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
+        ) {
+            long i = 0;
+            long read;
 
-        List<Callable<Void>> callableList = new ArrayList<>();
-        if (blockNumber < threadNumber || threadNumber < 2) {
-            Callable<Void> encodeCallable = RDPlusHEncode.builder()
-                    .filePositionToStart(0)
-                    .byteToEncode(fileLengthInByte)
-                    .indexToStart(this.startDigit)
-                    .delta(delta)
-                    .hash(hash)
-                    .bufferSize(bufferSize)
-                    .algorithm(algorithm)
-                    .inputFile(new RandomAccessFile(inputFile, "r"))
-                    .outputFile(new RandomAccessFile(outputFile, "rw"))
-                    .build();
-            callableList.add(encodeCallable);
-        } else {
-            long endOfPreviousBlock = 0;
-            for (int i = 0; i < threadNumber - 1; i++) {
-                Callable<Void> encodeCallable = RDPlusHEncode.builder()
-                        .filePositionToStart(endOfPreviousBlock)
-                        .byteToEncode(blockNumber / threadNumber * bufferSize)
-                        .indexToStart(endOfPreviousBlock / bufferSize * delta + startDigit)
-                        .delta(delta)
-                        .hash(hash)
-                        .bufferSize(bufferSize)
-                        .algorithm(algorithm)
-                        .inputFile(new RandomAccessFile(inputFile, "r"))
-                        .outputFile(new RandomAccessFile(outputFile, "rw"))
-                        .build();
-                callableList.add(encodeCallable);
+            byte[] previousOpenBlock = new byte[bufferSize];
+            System.arraycopy(hash, 0, previousOpenBlock, 0, bufferSize);
 
-                endOfPreviousBlock += blockNumber / threadNumber * bufferSize;
+            byte[] presentedDigit = new byte[bufferSize];
+            while ((read = inputStream.read(buffer, 0, bufferSize)) != -1) {
+                if (read < bufferSize) {
+                    PKCS7.doPadding(buffer, (int) (bufferSize - read));
+                }
+
+                presentLongAsByteArray(presentedDigit, i);
+                byte[] encoded = algorithm.encode(presentedDigit);
+
+                xor(buffer, encoded);
+                xor(buffer, previousOpenBlock);
+                outputStream.write(buffer);
+
+                i += delta;
             }
-
-            Callable<Void> encodeCallable = RDPlusHEncode.builder()
-                    .filePositionToStart(endOfPreviousBlock)
-                    .byteToEncode(fileLengthInByte - endOfPreviousBlock)
-                    .indexToStart(endOfPreviousBlock / bufferSize * delta + startDigit)
-                    .hash(hash)
-                    .delta(delta)
-                    .bufferSize(bufferSize)
-                    .algorithm(algorithm)
-                    .inputFile(new RandomAccessFile(inputFile, "r"))
-                    .outputFile(new RandomAccessFile(outputFile, "rw"))
-                    .build();
-            callableList.add(encodeCallable);
         }
-
-        callTasksAndWait(callableList);
     }
 
     @Override
