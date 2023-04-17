@@ -65,6 +65,9 @@ class RDPlusHCypherTestDES {
         File encodedFile = new File(encoded);
         File decodedFile = new File(decoded);
 
+        encodedFile.delete();
+        decodedFile.delete();
+
         cypher.encode(inputFile, encodedFile);
         cypher.decode(encodedFile, decodedFile);
 
@@ -80,6 +83,9 @@ class RDPlusHCypherTestDES {
         File inputFile = new File(input);
         File encodedFile = new File(encoded);
         File decodedFile = new File(decoded);
+
+        encodedFile.delete();
+        decodedFile.delete();
 
         cypher.encode(inputFile, encodedFile);
         cypher.decode(encodedFile, decodedFile);

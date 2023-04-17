@@ -56,7 +56,6 @@ public final class Cypher implements Closeable {
         Objects.requireNonNull(inputFile);
         Objects.requireNonNull(outputFile);
 
-        outputFile.delete();
         symmetricalBlockCypher.encode(inputFile, outputFile);
     }
 
@@ -64,7 +63,6 @@ public final class Cypher implements Closeable {
         Objects.requireNonNull(inputFile);
         Objects.requireNonNull(outputFile);
 
-        outputFile.delete();
         symmetricalBlockCypher.decode(inputFile, outputFile);
     }
 

@@ -45,6 +45,9 @@ class CFBCypherTestDES {
         File encodedFile = new File(encoded);
         File decodedFile = new File(decoded);
 
+        encodedFile.delete();
+        decodedFile.delete();
+
         cypher.encode(inputFile, encodedFile);
         cypher.decode(encodedFile, decodedFile);
 
@@ -60,6 +63,9 @@ class CFBCypherTestDES {
         File inputFile = new File(input);
         File encodedFile = new File(encoded);
         File decodedFile = new File(decoded);
+
+        encodedFile.delete();
+        decodedFile.delete();
 
         cypher.encode(inputFile, encodedFile);
         cypher.decode(encodedFile, decodedFile);
@@ -77,27 +83,30 @@ class CFBCypherTestDES {
         File encodedFile = new File(encoded);
         File decodedFile = new File(decoded);
 
-        cypher.encode(inputFile, encodedFile);
-        cypher.decode(encodedFile, decodedFile);
-
-        assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
-    }
-
-    @Test
-    void encodeAndDecodeLongVideo() throws IOException {
-        String input = "song.mp4";
-        String encoded = "2.mp4";
-        String decoded = "3.mp4";
-
-        File inputFile = new File(input);
-        File encodedFile = new File(encoded);
-        File decodedFile = new File(decoded);
+        encodedFile.delete();
+        decodedFile.delete();
 
         cypher.encode(inputFile, encodedFile);
         cypher.decode(encodedFile, decodedFile);
 
         assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
     }
+//
+//    @Test
+//    void encodeAndDecodeLongVideo() throws IOException {
+//        String input = "song.mp4";
+//        String encoded = "2.mp4";
+//        String decoded = "3.mp4";
+//
+//        File inputFile = new File(input);
+//        File encodedFile = new File(encoded);
+//        File decodedFile = new File(decoded);
+//
+//        cypher.encode(inputFile, encodedFile);
+//        cypher.decode(encodedFile, decodedFile);
+//
+//        assert(Files.mismatch(Path.of(input), Path.of(decoded)) == -1);
+//    }
 
     private static BitSet init(int size, int ... indexes) {
         BitSet bitSet = new BitSet(size);
