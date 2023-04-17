@@ -28,7 +28,7 @@ class CTRCypherTestDES {
                 key,
                 SymmetricalBlockMode.CTR,
                 new DES(new RoundKeysGeneratorDES(), new RoundTransformerDES()),
-                null, 2
+                2
         );
     }
 

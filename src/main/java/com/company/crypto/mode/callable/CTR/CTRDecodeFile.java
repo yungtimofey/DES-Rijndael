@@ -43,9 +43,9 @@ public class CTRDecodeFile implements Callable<Void> {
                     isFirstDecode = false;
                 } else {
                     outputStream.write(encoded);
+
                     i += delta;
                 }
-
                 presentLongAsByteArray(presentedDigit, i);
                 encoded = algorithm.encode(presentedDigit);
                 xor(encoded, buffer);

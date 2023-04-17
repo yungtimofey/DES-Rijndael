@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public final class Rijndael implements SymmetricalBlockEncryptionAlgorithm {
-
     public enum RijndaelBlockSize {
         BIT_128(128), BIT_192(192), BIT_256(256);
 

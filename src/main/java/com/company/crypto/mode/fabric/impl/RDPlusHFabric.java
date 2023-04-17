@@ -22,6 +22,11 @@ public class RDPlusHFabric implements SymmetricalBlockCypherFabric {
         if (IV.length != algorithm.getOpenTextBlockSizeInBytes()) {
             throw new IllegalArgumentException("Wrong IV size");
         }
-        return new RDPlusHCypher(algorithm,  IV, (byte[])args[positionOfHash]);
+
+        byte[] hash = (byte[])(args[positionOfHash]);
+        if (hash.length != algorithm.getOpenTextBlockSizeInBytes()) {
+            throw new IllegalArgumentException("Wrong hash size");
+        }
+        return new RDPlusHCypher(algorithm,  IV, hash);
     }
 }
