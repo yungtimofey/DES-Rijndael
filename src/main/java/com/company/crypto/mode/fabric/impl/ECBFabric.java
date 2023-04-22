@@ -1,17 +1,19 @@
 package com.company.crypto.mode.fabric.impl;
 
 import com.company.crypto.algorithm.SymmetricalBlockEncryptionAlgorithm;
-import com.company.crypto.mode.cypher.SymmetricalBlockCypher;
+import com.company.crypto.mode.cypher.SymmetricalBlockModeCypher;
 import com.company.crypto.mode.fabric.SymmetricalBlockCypherFabric;
 import com.company.crypto.mode.cypher.impl.ECBCypher;
 
+import java.util.Objects;
+
 public class ECBFabric implements SymmetricalBlockCypherFabric {
     @Override
-    public SymmetricalBlockCypher create(
-            Class<? extends SymmetricalBlockEncryptionAlgorithm> algorithmClass,
-            byte[] key,
+    public SymmetricalBlockModeCypher create(
+            SymmetricalBlockEncryptionAlgorithm algorithm,
             Object... args) {
+        Objects.requireNonNull(algorithm);
 
-        return new ECBCypher(algorithmClass, key);
+        return new ECBCypher(algorithm);
     }
 }
