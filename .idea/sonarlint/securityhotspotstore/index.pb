@@ -62,8 +62,6 @@ Nsrc/test/java/com/company/crypto/round/impl/RoundKeyGeneratorRijndaelTest.java
 Msrc/test/java/com/company/crypto/round/impl/RoundTransformerRijndaelTest.java,e\9\e90e49695545cd2ae9dd1b8cfd641bef3bf86726
 y
 Isrc/main/java/com/company/crypto/round/impl/RoundTransformerRijndael.java,f\4\f45b3d92688c03760bf81f027da591c02eb99854
-q
-Asrc/test/java/com/company/crypto/algorithm/impl/RijndaelTest.java,5\d\5da92e45412cc588872432789fdd873cc0e8897a
 …
 Usrc/main/java/com/company/polynomial/calculator/GaloisFieldPolynomialsCalculator.java,7\f\7f71efcd1b57d353749beec6d82a8c3d5a18b420
 ‰

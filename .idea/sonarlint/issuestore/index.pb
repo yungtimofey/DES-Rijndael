@@ -60,8 +60,6 @@ p
 Nsrc/test/java/com/company/crypto/round/impl/RoundKeyGeneratorRijndaelTest.java,2\a\2af37bc2fba932dc7f604c19c792090240f43d8b
 }
 Msrc/test/java/com/company/crypto/round/impl/RoundTransformerRijndaelTest.java,e\9\e90e49695545cd2ae9dd1b8cfd641bef3bf86726
-q
-Asrc/test/java/com/company/crypto/algorithm/impl/RijndaelTest.java,5\d\5da92e45412cc588872432789fdd873cc0e8897a
 y
 Isrc/main/java/com/company/crypto/round/impl/RoundTransformerRijndael.java,f\4\f45b3d92688c03760bf81f027da591c02eb99854
 …
