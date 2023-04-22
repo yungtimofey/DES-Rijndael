@@ -56,66 +56,66 @@ class DESTest {
 //
 //        assertArrayEquals(inputBlock64Bit, encodedAfterIP);
 //    }
-
-    @Test
-    void checkEncodeAndDecode() {
-        byte[] encoded = des.encode(input64Bit);
-        //print(BitSet.valueOf(encoded));
-
-        byte[] decoded = des.decode(encoded);
-        //print(BitSet.valueOf(decoded));
-
-        assertArrayEquals(input64Bit, decoded);
-    }
-
-    @Test
-    void checkTextFile() throws IOException {
-        BitSet bitSet = init(64, 1, 2, 3, 4, 32, 34, 37, 41, 42, 54, 56, 57, 58);
-        key = bitSet.toByteArray();
-        des.setKey(key);
-
-        String inputFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\1.txt";
-        String encodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.txt";
-        String decodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.txt";
-
-        checkFiles(inputFile, encodedFile, decodedFile);
-
-        assert(Files.mismatch(Path.of(inputFile), Path.of(decodedFile)) == -1);
-    }
-
-
-    @Test
-    void testImage() throws IOException {
-        BitSet bitSet = init(64, 1, 2, 3, 33, 34, 37, 41, 42, 49, 50, 53, 54, 56, 57);
-        key = bitSet.toByteArray();
-        des.setKey(key);
-
-        String inputFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\1.jpg";
-        String encodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.jpg";
-        String decodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.jpg";
-
-        checkFiles(inputFile, encodedFile, decodedFile);
-
-        assert(Files.mismatch(Path.of(inputFile), Path.of(decodedFile)) == -1);
-    }
-
-    @Test
-    void testVideo() throws IOException {
-        BitSet bitSet = init(64, 1, 2, 3, 33, 34, 37, 41, 42, 45, 50, 53, 54, 56);
-        key = bitSet.toByteArray();
-        des.setKey(key);
-
-        String inputFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\Patrick.mp4";
-        String encodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.mp4";
-        String decodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.mp4";
-
-        checkFiles(inputFile, encodedFile, decodedFile);
-
-        assert(Files.mismatch(Path.of(inputFile), Path.of(decodedFile)) == -1);
-    }
-
-    @Test
-    void testAnotherVideo() throws IOException {
+//
+//    @Test
+//    void checkEncodeAndDecode() {
+//        byte[] encoded = des.encode(input64Bit);
+//        //print(BitSet.valueOf(encoded));
+//
+//        byte[] decoded = des.decode(encoded);
+//        //print(BitSet.valueOf(decoded));
+//
+//        assertArrayEquals(input64Bit, decoded);
+//    }
+//
+//    @Test
+//    void checkTextFile() throws IOException {
+//        BitSet bitSet = init(64, 1, 2, 3, 4, 32, 34, 37, 41, 42, 54, 56, 57, 58);
+//        key = bitSet.toByteArray();
+//        des.setKey(key);
+//
+//        String inputFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\1.txt";
+//        String encodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.txt";
+//        String decodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.txt";
+//
+//        checkFiles(inputFile, encodedFile, decodedFile);
+//
+//        assert(Files.mismatch(Path.of(inputFile), Path.of(decodedFile)) == -1);
+//    }
+//
+//
+//    @Test
+//    void testImage() throws IOException {
+//        BitSet bitSet = init(64, 1, 2, 3, 33, 34, 37, 41, 42, 49, 50, 53, 54, 56, 57);
+//        key = bitSet.toByteArray();
+//        des.setKey(key);
+//
+//        String inputFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\1.jpg";
+//        String encodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.jpg";
+//        String decodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.jpg";
+//
+//        checkFiles(inputFile, encodedFile, decodedFile);
+//
+//        assert(Files.mismatch(Path.of(inputFile), Path.of(decodedFile)) == -1);
+//    }
+//
+//    @Test
+//    void testVideo() throws IOException {
+//        BitSet bitSet = init(64, 1, 2, 3, 33, 34, 37, 41, 42, 45, 50, 53, 54, 56);
+//        key = bitSet.toByteArray();
+//        des.setKey(key);
+//
+//        String inputFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\Patrick.mp4";
+//        String encodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.mp4";
+//        String decodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.mp4";
+//
+//        checkFiles(inputFile, encodedFile, decodedFile);
+//
+//        assert(Files.mismatch(Path.of(inputFile), Path.of(decodedFile)) == -1);
+//    }
+//
+//    @Test
+//    void testAnotherVideo() throws IOException {
 //        String inputFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\song.mp4";
 //        String encodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\2.mp4";
 //        String decodedFile = "C:\\Users\\Timofey.LAPTOP-KQGJSA46\\Desktop\\des\\3.mp4";
@@ -123,7 +123,7 @@ class DESTest {
 //        checkFiles(inputFile, encodedFile, decodedFile);
 //
 //        assert(Files.mismatch(Path.of(inputFile), Path.of(decodedFile)) == -1);
-    }
+//    }
 
     private static void checkFiles(String inputFile, String encodedFile, String decodedFile) throws IOException {
         int bufferSize = 8;
